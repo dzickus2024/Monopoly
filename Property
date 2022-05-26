@@ -1,0 +1,138 @@
+import java.awt.*;
+
+public class Property extends Tile {
+	private int baseRent;
+	private String color;
+	private int houses;
+	private boolean hotel;
+	private int cost;
+	//private String name;
+	//private String nameShort; in Tile class
+	//private int pos;
+	private int playerOwner;
+	
+	public Property(/*int rent, String col, int cos, String nam, int position*/int pos) {
+		super(pos);
+		//baseRent = rent;
+		//color = col;
+		//cost = cos;
+		//name = nam;
+		//nameShort = name.substring(0, 3); //all of these can be based off of the position
+	}
+	
+	private int getRent() {
+		/*
+		 *  else if (pos == ) {
+			if (houses == 0 && hotel == false) {
+				return ;
+			} else if (houses == 1) {
+				return ;
+			} else if (houses == 2) {
+				return ;
+			} else if (houses == 3) {
+				return ;
+			} else if (houses == 4) {
+				return ;
+			} else if (hotel == true) {
+				return ;
+			}
+		}
+		 */
+		/*if (pos == 1) {
+			if (houses == 0 && hotel == false) {
+				return 2;
+			} else if (houses == 1) {
+				return 10;
+			} else if (houses == 2) {
+				return 30;
+			} else if (houses == 3) {
+				return 90;
+			} else if (houses == 4) {
+				return 160;
+			} else if (hotel == true) {
+				return 250;
+			}
+		} else if (pos == 3) {
+			if (houses == 0 && hotel == false) {
+				return 4;
+			} else if (houses == 1) {
+				return 20;
+			} else if (houses == 2) {
+				return 60;
+			} else if (houses == 3) {
+				return 180;
+			} else if (houses == 4) {
+				return 320;
+			} else if (hotel == true) {
+				return 450;
+			}
+		} else if (pos == 6 || pos == 8) {
+			if (houses == 0 && hotel == false) {
+				return 6;
+			} else if (houses == 1) {
+				return 30;
+			} else if (houses == 2) {
+				return 90;
+			} else if (houses == 3) {
+				return 270;
+			} else if (houses == 4) {
+				return 400;
+			} else if (hotel == true) {
+				return 550;
+			}
+		} else if (pos == 9) {
+			if (houses == 0 && hotel == false) {
+				return ;
+			} else if (houses == 1) {
+				return ;
+			} else if (houses == 2) {
+				return ;
+			} else if (houses == 3) {
+				return ;
+			} else if (houses == 4) {
+				return ;
+			} else if (hotel == true) {
+				return ;
+			}
+		}*/
+	}
+	
+	private void payRent(Player owner, Player payer) {
+		payer.changeBal(calcRent());
+		owner.changeBal(calcRent());
+	}
+	
+	private void changeOwner(int ownerNum) {
+		
+	}
+	
+	public void printStats() {
+		int x = calcRent();
+		System.out.println("Rent: " + x);
+		System.out.println("Color: " + color);
+		System.out.println("Houses: " + houses);
+	}
+	
+	public Color getColor() {
+		Color color;
+		if(pos==1||pos==3) {
+			color = new Color(139,69,19);
+			return color;
+		} else if(pos==6||pos==8||pos==9) {
+			return Color.cyan;
+		} else if(pos==11||pos==13||pos==14) {
+			return Color.magenta;
+		} else if(pos==16||pos==18||pos==19) {
+			return Color.orange;
+		} else if(pos==21||pos==23||pos==24) {
+			return Color.red;
+		} else if(pos==26||pos==27||pos==29) {
+			return Color.yellow;
+		} else if(pos==31||pos==32||pos==34) {
+			return Color.green;
+		} else if(pos==37||pos==39) {
+			return Color.blue;
+		}
+		return Color.white;
+	}
+}
