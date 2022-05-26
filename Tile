@@ -1,0 +1,39 @@
+import java.awt.Color;
+
+public class Tile {
+	protected int pos;
+	protected String name; 
+	
+	public Tile() {
+		
+	}
+	
+	public Tile(int pos) {
+		this.pos = pos;
+	}
+	
+	public void checkPos(int pos) {
+		
+		//return name of tile
+		//what it is property, tax, etc.
+		//cost
+		//who owns it
+	}
+	
+	public Color getColor() {
+		return null;
+	}
+	
+	public int getPos() {
+		return pos;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public String getShortName() {
+		return name.substring(0,3);
+	}
+	
+}
