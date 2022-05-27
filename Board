@@ -169,40 +169,45 @@ public class Board {
 		} else if(pos==30) {
 			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4,outMargin+inMargin/4,inMargin/2,inMargin/2);
 		} else if(pos<40) {
-			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4,(int)(outMargin+inMargin+(31-pos)*tileWidth),inMargin/2,(int)(tileWidth));
+			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4+2,(int)(outMargin+inMargin+(39-pos)*tileWidth),inMargin/2,(int)(tileWidth));
 		} else {//in jail
 			jail = true;
 			g.drawRect(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,inMargin/2,inMargin/2);
 		}
-		/*if(pieceNum==1) {
+		if(pieceNum==0) {
 			drawPlayer1(pos, outMargin, inMargin, tileWidth);
-		} else if(pieceNum==2) {
+		} else if(pieceNum==1) {
 			drawPlayer2(pos, outMargin, inMargin, tileWidth);
-		} else if(pieceNum==3) {
+		} else if(pieceNum==2) {
 			drawPlayer3(pos, outMargin, inMargin, tileWidth);
-		} else {
+		} else {//only 4 pieces
 			drawPlayer4(pos, outMargin, inMargin, tileWidth);
-		}*/
+		}
 		if(jail) {
 			//draw bars over player
 		}
 	}
 	
-	private void drawPlayer1(int pos, int outMargin, int inMargin, int tileWidth) {//"x"
-		g.setColor(Color.red);
+	private void drawPlayer1(int pos, int outMargin, int inMargin, double tileWidth) {//"x"
 		int comMarg = outMargin + inMargin;
 		if(pos==0) {
-			
+			g.drawLine(panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-inMargin/4);
+			g.drawLine(panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-inMargin/4);
 		} else if(pos<10) {
-			//g.drawRect(comMarg+(9-pos)*tileWidth,panel.getHeight()-comMarg-)
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin-(pos-1)*tileWidth),panel.getHeight()-outMargin-3*inMargin/4,(int)(panel.getWidth()-outMargin-inMargin-(pos)*tileWidth),panel.getHeight()-outMargin-inMargin/4);
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin-pos*tileWidth),panel.getHeight()-outMargin-3*inMargin/4,(int)(panel.getWidth()-outMargin-inMargin-(pos-1)*tileWidth),panel.getHeight()-outMargin-inMargin/4);
 		} else if(pos==10) {
-			
+			g.drawLine(outMargin,panel.getHeight()-outMargin,outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin/2);
+			g.drawLine(outMargin,panel.getHeight()-outMargin-inMargin/2,outMargin+inMargin/2,panel.getHeight()-outMargin);
 		} else if(pos<20) {
-			
+			g.drawLine((int)(outMargin+3*inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10-1)*tileWidth),(int)(outMargin+inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth));
+			g.drawLine((int)(outMargin+inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10-1)*tileWidth),(int)(outMargin+3*inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth));
 		} else if(pos==20) {
-			
+			g.drawLine(outMargin+inMargin/4,outMargin+inMargin/4,outMargin+3*inMargin/4,outMargin+3*inMargin/4);
+			g.drawLine(outMargin+3*inMargin/4,outMargin+inMargin/4,outMargin+inMargin/4,outMargin+3*inMargin/4);
 		} else if(pos<30) {
-			
+			g.drawLine((int)(outMargin+inMargin+(pos-21)*tileWidth),outMargin+3*inMargin/4,(int)(outMargin+inMargin+(pos-20)*tileWidth),outMargin+inMargin/4);
+			g.drawLine((int)(outMargin+inMargin+(pos-21)*tileWidth),outMargin+inMargin/4,(int)(outMargin+inMargin+(pos-20)*tileWidth),outMargin+3*inMargin/4);
 		} else if(pos==30) {
 			
 		} else if(pos<40) {
@@ -211,7 +216,7 @@ public class Board {
 			
 		}
 	}
-	private void drawPlayer2(int pos, int outMargin, int inMargin, int tileWidth) {
+	private void drawPlayer2(int pos, int outMargin, int inMargin, double tileWidth) {
 		if(pos<10) {
 			//g.
 		} else if(pos==10) {
@@ -230,7 +235,7 @@ public class Board {
 			
 		}
 	}
-	private void drawPlayer3(int pos, int outMargin, int inMargin, int tileWidth) {
+	private void drawPlayer3(int pos, int outMargin, int inMargin, double tileWidth) {
 		if(pos<10) {
 			//g.
 		} else if(pos==10) {
@@ -249,7 +254,7 @@ public class Board {
 			
 		}
 	}
-	private void drawPlayer4(int pos, int outMargin, int inMargin, int tileWidth) {
+	private void drawPlayer4(int pos, int outMargin, int inMargin, double tileWidth) {
 		if(pos<10) {
 			//g.
 		} else if(pos==10) {
