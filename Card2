@@ -1,0 +1,123 @@
+import java.util.*;
+
+public class Card {
+	private static ArrayList<String> chestText;
+	private static ArrayList<String> chanceText;
+	private ArrayList<Integer> chestDeck;//holds card order
+	private ArrayList<Integer> chanceDeck;
+	
+	public Card() {
+		chestText = new ArrayList<String>();
+		chestText.add("Advance to \"Go\".");
+		chestText.add("Bank error in your favor. Collect $200.");
+		chestText.add("Doctor’s Fees. Pay $50.");
+		chestText.add("From sale stock you get $50.");
+		chestText.add("Get out of Jail Free.");
+		chestText.add("Go to Jail.");
+		chestText.add("Grand Opera Night. Collect $50 from each player.");
+		chestText.add("Holiday Fund matures. Collect $100.");
+		chestText.add("Income Tax Refund. Collect $20.");
+		chestText.add("It’s your birthday. Collect $10 from every player.");
+		chestText.add("Life insurance matures. Collect $100.");
+		chestText.add("Hospital Fees. Pay $50.");
+		chestText.add("School Fees. Pay $50.");
+		chestText.add("Receive $25 consultancy fee.");
+		chestText.add("You are assessed for street repairs: Pay $40 per house and $115 per hotel you own.");
+		chestText.add("You have won second prize in a beauty contest. Collect $10.");
+		chestText.add("You inherit $100.");
+		
+		chanceText = new ArrayList<String>();
+		chanceText.add("Advance to \"Go\".");
+		chanceText.add("Advance to Illinois Ave (If you pass go collect $200)");
+		chanceText.add("Advance to St. Charles Place (If you pass go collect $200)");
+		chanceText.add("Advance to the nearest Utility, if unowned, you may buy it from the Bank."
+				+ "\nIf owned, roll dice pay owner 10 times the amount rolled");
+		chanceText.add("Advance to the nearest Railroad. If unowned, you may buy it from the Bank. "
+				+ "\nIf owned, pay the owner twice the rent to which they are otherwise entitled");
+		chanceText.add("Bank pays you dividend of $50");
+		chanceText.add("Get out of Jail Free");
+		chanceText.add("Go back 3 spaces");
+		chanceText.add("Make general repairs on all your property: "
+				+ "\nfor each house pay $25, for each hotel pay $100");
+		chanceText.add("Pay poor tax of $15");
+		chanceText.add("Take a trip to Reading railroad. If you pass go collect $200");
+		chanceText.add("Take a walk on Boardwalk");
+		chanceText.add("You have been elected Chairman of the Board. Pay each player $50");
+		chanceText.add("Your building and loan matures. Receive $150");
+		chanceText.add("You have won a crossword competition. Collect $100");
+	}
+	
+	/*public int pickCard(String type) {
+		int num = -1;
+		if(type.equals("chance")) {
+			num = (int)(Math.random()*15);
+		} else if(type.equals("chest")) {
+			num = (int)(Math.random()*18);
+		}
+		return num;
+	}*/
+	
+	private ArrayList<Integer> shuffle(ArrayList<String> deck) {
+		ArrayList<Integer> copy = new ArrayList<Integer>();
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		int index;
+		for(int i = 0; i < deck.size(); i++) {
+			copy.add(i+1);
+		}
+		for(int i = 0; i < deck.size(); i++) {
+			index = (int)(Math.random()*copy.size());
+			temp.add(copy.get(index));
+			copy.remove(index);
+		}
+		return temp;
+	}
+	
+	public int pickCard(String deckName) {
+		ArrayList<Integer> deck = new ArrayList<Integer>();
+		if(deckName.equals("chest")) {
+			deck = chestDeck;
+		} else if(deckName.equals("chance")) {
+			deck = chanceDeck;
+		} else {
+			return -1;
+		}
+		int card = deck.get(0);
+		deck.remove(0);
+		deck.add(card); //put card on the bottom
+		return card;
+	}
+	
+	public boolean setJailCard(String deck) {
+		boolean remove;
+		if(deck.equals("chest")) {
+			if(chestDeck.contains(4)) {
+				remove = true;
+			} else {
+				remove = false;
+			}
+		} else if(deck.equals("chance")) {
+			if(chanceDeck.contains(6)) {
+				remove = true;
+			} else {
+				remove = false;
+			}
+		} else {
+			return false;
+		}
+		if(remove) {
+			if(deck.equals("chest")) {
+				chestDeck.remove(chestDeck.indexOf(4));//remove the jail card
+			} else if(deck.equals("chance")) {
+				chanceDeck.remove(chanceDeck.indexOf(6));//remove the jail card
+			}
+			return true;
+		} else {
+			if(deck.equals("chest")) {
+				chestDeck.add(4);//add the jail card back
+			} else if(deck.equals("chance")) {
+				chanceDeck.add(6);//add the jail card back
+			}
+			return false;
+		}
+	}
+}
