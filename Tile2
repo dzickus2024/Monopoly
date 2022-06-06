@@ -12,7 +12,7 @@ public class Tile {
 	}
 	
 	public void printStats() {
-		System.out.println(name + " (Position: " + (pos + 1) + ")");
+		System.out.println(name + " (Position: " + (pos) + ")");
 	}
 	
 	public int getOwner() {
@@ -28,7 +28,7 @@ public class Tile {
 	}
 	
 	public void checkPos(int num, int roll) {
-		System.out.println(name + " (Position: " + (pos + 1) + ")");
+		System.out.println(name + " (Position: " + (pos) + ")");
 		if (pos == 7 || pos == 22 || pos == 36) {
 			Board.drawChance(num);
 		} else if (pos == 2 || pos == 17 || pos == 33) {
