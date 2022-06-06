@@ -1,0 +1,541 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.Scanner;
+import java.util.ArrayList;
+public class Board {
+	private int[] isProperty = {0,1,0,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,0,1,0};
+	private static Tile[] tiles;
+	//private static int freeParkingCash;
+	private DrawingPanel panel;
+	private Graphics g;
+	private static Color boardColor;
+	
+	//protected int[] tiles;
+	//protected Tile[] spaces;
+	private static int freeParking;
+	protected static ArrayList<Player> players;
+	private static Card decks;
+	
+	public Board() {
+		tiles = new Tile[41];
+		for(int i = 0; i < tiles.length; i++) {
+			if(isProperty[i]==1) {
+				tiles[i] = new Property(i);
+			} else {
+				tiles[i] = new Tile(i);
+			}
+		}
+		boardColor = new Color(191, 219, 174);
+		//System.out.println("STARTBOARD");
+		Scanner console = new Scanner(System.in);
+		//tiles = new int[41];
+		/*for (int i = 0; i < tiles.length; i++) {
+			tiles[i] = i;
+		}*/
+		System.out.println("How many players are there? ");
+		int x = console.nextInt();
+		System.out.println(x+" players");
+		players = new ArrayList<Player>();
+		for (int i = 0; i < x; i++) {
+			System.out.println("Player " + (i + 1) + " name: ");
+			String name = console.next();
+			Player player = new Player(name);
+			players.add(player);
+			//System.out.println("LOOPRESTART");
+		}
+		//System.out.println("LOOPEND");
+		decks = new Card();
+		//40 tiles and jail
+		for (int i = 0; i <= 40; i++) {
+			if (i == 0 || i == 2 || i == 4 || i == 7 || i == 10 || i == 17 || i == 20 || i == 22 || i == 30 || i == 33 || i == 36 || i == 38 || i == 40) {
+				tiles[i] = new Tile(i);
+			} else if (i == 5 || i == 15 || i == 25 || i == 35) {
+				tiles[i] = new Railroad(i);
+			} else if (i == 12 || i == 28) {
+				tiles[i] = new Utility(i);
+			} else {
+				tiles[i] = new Property(i);
+			}
+		}
+		panel = new DrawingPanel(600,600);
+		g = panel.getGraphics();
+	}
+	
+	public static ArrayList<Player> getPlayers() {
+		return players;
+	}
+	
+	public static Tile[] getTiles() {
+		return tiles;
+	}
+	
+	/*public static int rollDice() {
+		return (int)(Math.random()*6)+1;
+	}*/
+	
+	public static void freeParking(Player player) {
+		player.changeBal(freeParking);
+		if (freeParking >= 1000) {
+			//achievementFour();
+		}
+		freeParking = 0;
+	}
+	
+	public static void drawChest(int num) {
+		int card = decks.pickCard("chest");
+		if (card == 0) {
+			players.get(num).setPos(0, true);
+		} else if (card == 1) {
+			players.get(num).changeBal(200);
+		} else if (card == 2) {
+			players.get(num).changeBal(-50);
+			freeParking += 50;
+		} else if (card == 3) {
+			players.get(num).changeBal(50);
+		} else if (card == 4) {
+			if (decks.setJailCard("chest") == true) {
+				players.get(num).setChestCard(true);
+			} else {
+				drawChest(num);
+			}
+		} else if (card == 5) {
+			players.get(num).setPos(40, false);
+		} else if (card == 6) {
+			int count = 0;
+			for (int i = 0; i < players.size(); i++) {
+				if (i != num) {
+					players.get(i).changeBal(-50);
+					count = count + 50;
+				}
+			}
+			players.get(num).changeBal(count);
+		} else if (card == 7) {
+			players.get(num).changeBal(100);
+		} else if (card == 8) {
+			players.get(num).changeBal(20);
+		} else if (card == 9) {
+			int count = 0;
+			for (int i = 0; i < players.size(); i++) {
+				if (i != num) {
+					players.get(i).changeBal(-10);
+					count = count + 10;
+				}
+			}
+			players.get(num).changeBal(count);
+		} else if (card == 10) {
+			players.get(num).changeBal(100);
+		} else if (card == 11) {
+			players.get(num).changeBal(-50);
+			freeParking += 50;
+		} else if (card == 12) {
+			players.get(num).changeBal(-50);
+			freeParking += 50;
+		} else if (card == 13) {
+			players.get(num).changeBal(25);
+		} else if (card == 14) {
+			int var = players.get(num).numberOfHouses() * 40;
+			int var2 = players.get(num).numberOfHotels() * 115;
+			players.get(num).changeBal(-1 * (var + var2));
+			freeParking += var + var2;
+		} else if (card == 15) {
+			players.get(num).changeBal(10);
+		} else if (card == 16) {
+			players.get(num).changeBal(100);
+		}
+	}
+	
+	public static void drawChance(int num) {
+		int card = decks.pickCard("chance");
+		if (card == 0) {
+			players.get(num).setPos(0, true);
+		} else if (card == 1) {
+			players.get(num).setPos(24, true);
+		} else if (card == 2) {
+			players.get(num).setPos(11, true);
+		} else if (card == 3) {
+			int var = players.get(num).getPos();
+			if (var >= 0 && var < 12 || var >= 28) {
+				players.get(num).setPos(12, true);
+				for (int i = 0; i < players.size(); i++) {
+					if (i != num) {
+						if (players.get(i).getProps().contains(tiles[12])) {
+							int payment = (rollDice() + rollDice()) * 10;
+							players.get(num).changeBal(-1 * payment);
+							players.get(i).changeBal(payment);
+						}
+					}
+				}
+			} else {
+				players.get(num).setPos(28, true);
+				for (int i = 0; i < players.size(); i++) {
+					if (i != num) {
+						if (players.get(i).getProps().contains(tiles[28])) {
+							int payment = (rollDice() + rollDice()) * 10;
+							players.get(num).changeBal(-1 * payment);
+							players.get(i).changeBal(payment);
+						}
+					}
+				}
+			}
+		} else if (card == 4) {
+			int var = players.get(num).getPos();
+			if (var >= 0 && var < 5 || var > 35 && var <= 39) {
+				players.get(num).setPos(5, true);
+				for (int i = 0; i < players.size(); i++) {
+					if (i != num) {
+						if (players.get(i).getProps().contains(tiles[5])) {
+							players.get(num).changeBal(-1 * (tiles[5].calcRent()));
+							players.get(i).changeBal(tiles[5].calcRent());
+						}
+					}
+				}
+			} else if (var >= 5 && var < 15) {
+				players.get(num).setPos(15, true);
+				for (int i = 0; i < players.size(); i++) {
+					if (i != num) {
+						if (players.get(i).getProps().contains(tiles[15])) {
+							players.get(num).changeBal(-1 * (tiles[15].calcRent()));
+							players.get(i).changeBal(tiles[15].calcRent());
+						}
+					}
+				}
+			} else if (var >= 15 && var < 25) {
+				players.get(num).setPos(25, true);
+				for (int i = 0; i < players.size(); i++) {
+					if (i != num) {
+						if (players.get(i).getProps().contains(tiles[25])) {
+							players.get(num).changeBal(-1 * (tiles[25].calcRent()));
+							players.get(i).changeBal(tiles[25].calcRent());
+						}
+					}
+				}
+			} else {
+				players.get(num).setPos(35, true);
+				for (int i = 0; i < players.size(); i++) {
+					if (i != num) {
+						if (players.get(i).getProps().contains(tiles[35])) {
+							players.get(num).changeBal(-1 * (tiles[35].calcRent()));
+							players.get(i).changeBal(tiles[35].calcRent());
+						}
+					}
+				}
+			}
+		} else if (card == 5) {
+			players.get(num).changeBal(50);
+		} else if (card == 6) {
+			if (decks.setJailCard("chance") == true) {
+				players.get(num).setChanceCard(true);
+			} else {
+				drawChest(num);
+			}
+		} else if (card == 7) {
+			players.get(num).setPos((players.get(num).getPos()) - 3, true);
+		} else if (card == 8) {
+			int var = players.get(num).numberOfHouses() * 25;
+			int var2 = players.get(num).numberOfHotels() * 100;
+			players.get(num).changeBal(-1 * (var + var2));
+			freeParking += var + var2;
+		} else if (card == 9) {
+			players.get(num).changeBal(-15);
+			freeParking += 15;
+		} else if (card == 10) {
+			players.get(num).setPos(5, true);
+		} else if (card == 11) {
+			players.get(num).setPos(39, true);
+		} else if (card == 12) {
+			for (int i = 0; i < players.size(); i++) {
+				if (i != num) {
+					players.get(num).changeBal(-50);
+					players.get(i).changeBal(50);
+				}
+			}
+		} else if (card == 13) {
+			players.get(num).changeBal(150);
+		} else if (card == 14) {
+			players.get(num).changeBal(100);
+		}
+	}
+	public static void removePlayer(int num) {
+		for (int i = 0; i < players.get(num).getProps().size(); i++) {
+			players.get(num).getProps().get(i).setHouses(0);
+			players.get(num).getProps().get(i).setHotel(false);
+			players.get(num).getProps().get(i).setOwner(0);
+		}
+		players.remove(num);
+	}
+
+	public static void addParking(int var) {
+		freeParking += var;
+	}
+	public static Color getBoardColor() {
+		return boardColor;
+	}
+	
+	public static int rollDice() {
+		return (int)(Math.random()*6)+1;
+	}
+	
+	/*public static void freeParking(Player player) {
+		player.changeBal(freeParking);
+	}*/
+	
+	/*public static String checkPos(int pos) {
+		if(property) {
+			if(railroad) {
+				
+			} else if(utility) {
+				
+			} else {
+				
+			}
+		} else if(tax) {
+			
+		} else if(chance) {
+			
+		} else if(chest) {
+			
+		} else if(freeParking) {
+			
+		}else if(goToJail) {
+			
+		} else if(go) {
+			
+		} else if(jail) {
+			
+		} else {//passing jail
+			
+		}
+	}*/
+	
+	public void drawBoard() {
+		Color color;
+		int outMargin = 25;
+		int inMargin = 75;
+		int combinedMargin = outMargin+inMargin;
+		int tilesPerSide = 11;
+		int offset = 0;
+		double widthTile = (panel.getWidth()-2*combinedMargin)/(double)(tilesPerSide-2);
+		color = boardColor;
+		g.setColor(color);
+		g.fillRect(outMargin,outMargin,panel.getWidth()-2*outMargin,panel.getHeight()-2*outMargin);
+		g.setColor(Color.black);
+		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
+			if(isProperty[i]==1) {
+				g.setColor(tiles[i].getColor());
+				g.fillRect((int)(panel.getWidth()-combinedMargin-i*widthTile),panel.getHeight()-combinedMargin,(int)(widthTile)+1,inMargin/4);
+			} else {
+				//ends in 5 is a railroad
+			}
+		}
+		offset+=10;
+		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
+			if(isProperty[i+offset]==1) {
+				g.setColor(tiles[i+offset].getColor());
+				g.fillRect((int)(outMargin+3*inMargin/4.0),(int)(panel.getWidth()-combinedMargin-i*(widthTile)),inMargin/4+1,(int)(widthTile)+1);
+			} else {
+				//special drawing
+			}
+		}
+		offset+=11;
+		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
+			if(isProperty[i+offset]==1) {
+				g.setColor(tiles[i+offset].getColor());
+				g.fillRect((int)(combinedMargin+i*widthTile),combinedMargin-inMargin/4+1,(int)(widthTile)+1,inMargin/4);
+			} else {
+				//special drawing
+			}
+		}
+		offset+=10;
+		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
+			if(isProperty[i+offset]==1) {
+				g.setColor(tiles[i+offset].getColor());
+				g.fillRect(panel.getWidth()-combinedMargin,(int)(combinedMargin+i*widthTile),inMargin/4+1,(int)(widthTile)+1);
+			} else {
+				//special drawing
+			}
+		}
+		//draw railroads
+		for(int i = 0; i < 4; i++) {
+			drawRailroad(5+i*10,widthTile,inMargin,outMargin);
+		}
+		g.setColor(Color.BLACK);
+		g.drawRect(outMargin,outMargin,panel.getWidth()-2*outMargin,panel.getHeight()-2*outMargin);
+		g.drawRect(combinedMargin, combinedMargin, panel.getWidth()-2*combinedMargin, panel.getHeight()-2*combinedMargin);
+		for(int i = 0; i < tilesPerSide-1; i++) {
+			g.drawLine((int)(combinedMargin+i*widthTile),outMargin,(int)(combinedMargin+i*widthTile),combinedMargin);
+		}
+		for(int i = 0; i < tilesPerSide-1; i++) {
+			g.drawLine((int)(combinedMargin+i*widthTile),panel.getHeight()-outMargin,(int)(combinedMargin+i*widthTile),panel.getHeight()-combinedMargin);
+		}
+		for(int i = 0; i < tilesPerSide-1; i++) {
+			g.drawLine(outMargin,(int)(combinedMargin+i*widthTile),combinedMargin,(int)(combinedMargin+i*widthTile));
+		}
+		for(int i = 0; i < tilesPerSide-1; i++) {
+			g.drawLine(panel.getWidth()-outMargin,(int)(combinedMargin+i*widthTile),panel.getWidth()-combinedMargin,(int)(combinedMargin+i*widthTile));
+		}
+		/*for(int i = 0; i < 41; i++) {
+			drawPlayer(0,i,outMargin,inMargin,widthTile);
+		}*/
+		drawJail(inMargin,outMargin);
+		drawChest(inMargin,outMargin,(int)(widthTile),2);
+	}
+	
+	private void drawChest(int inMargin, int outMargin, int tileWidth, int pos) {
+		g.setColor(Color.cyan);
+		if(pos<10) {
+			g.fillRect(panel.getWidth()-outMargin-inMargin-tileWidth*(pos-1)-3*tileWidth/4,panel.getHeight()-outMargin-3*inMargin/4,tileWidth/2,inMargin/2);
+			g.setColor(Color.white);
+			g.drawRect(panel.getWidth()-outMargin-inMargin-tileWidth*(pos-1)-3*tileWidth/4,panel.getHeight()-outMargin-3*inMargin/4,tileWidth/2,inMargin/2);
+		}
+	}
+	
+	private void drawRailroad(int pos, double width, int height, int margin) {
+		g.setColor(Color.black);
+		if(pos<10) {
+			g.drawLine((int)(margin+height+width*(9-pos)+width/4.0),(int)(panel.getHeight()-margin-3*height/4.0),(int)(margin+height+width*(9-pos)+3*width/4.0),(int)(panel.getHeight()-margin-height/4.0));
+			g.drawLine((int)(margin+height+width*(9-pos)+width/4.0),(int)(panel.getHeight()-margin-height/4.0),(int)(margin+height+width*(9-pos)+3*width/4.0),(int)(panel.getHeight()-margin-3*height/4.0));
+		} else if(pos<20) {
+			g.drawLine((int)(margin+height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0),(int)(margin+3*height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0));
+			g.drawLine((int)(margin+height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0),(int)(margin+3*height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0));
+		} else if(pos<30) {
+			g.drawLine((int)(margin+height+width*(pos%10-1)+width/4.0),(int)(margin+3*height/4.0),(int)(margin+height+width*(pos%10-1)+3*width/4.0),(int)(margin+height/4.0));
+			g.drawLine((int)(margin+height+width*(pos%10-1)+width/4.0),(int)(margin+height/4.0),(int)(margin+height+width*(pos%10-1)+3*width/4.0),(int)(margin+3*height/4.0));
+		} else {
+			g.drawLine((int)(panel.getWidth()-margin-height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0),(int)(panel.getWidth()-margin-3*height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0));
+			g.drawLine((int)(panel.getWidth()-margin-height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0),(int)(panel.getWidth()-margin-3*height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0));
+		}
+	}
+	
+	private void drawPlayer(int pieceNum, int pos, int outMargin, int inMargin, double tileWidth) {
+		Color color = Player.getColors()[pieceNum];
+		g.setColor(color);
+		if(pos==0) {
+			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,inMargin/2,inMargin/2);
+		} else if(pos<10) {
+			g.drawRect((int)(outMargin+inMargin+(9-pos)*tileWidth),panel.getHeight()-outMargin-3*inMargin/4+2,(int)(tileWidth),inMargin/2);
+		} else if(pos==10) {
+			g.drawRect(outMargin,panel.getHeight()-outMargin-inMargin/2,inMargin/2,inMargin/2);
+		} else if(pos<20) {
+			g.drawRect((int)(outMargin+inMargin/4-2),(int)(panel.getHeight()-outMargin-inMargin+(10-pos)*tileWidth),inMargin/2,(int)(tileWidth));
+		} else if(pos==20) {
+			g.drawRect(outMargin+inMargin/4,outMargin+inMargin/4,inMargin/2,inMargin/2);
+		} else if(pos<30) {
+			g.drawRect((int)(outMargin+inMargin+(pos-21)*tileWidth),outMargin+inMargin/4,(int)(tileWidth),inMargin/2);
+		} else if(pos==30) {
+			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4,outMargin+inMargin/4,inMargin/2,inMargin/2);
+		} else if(pos<40) {
+			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4+2,(int)(outMargin+inMargin+(39-pos)*tileWidth),inMargin/2,(int)(tileWidth));
+		} else {//in jail
+			g.drawRect(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,inMargin/2,inMargin/2);
+		}
+		if(pieceNum==0) {
+			drawPlayer1(pos, outMargin, inMargin, tileWidth);
+		} else if(pieceNum==1) {
+			drawPlayer2(pos, outMargin, inMargin, tileWidth);
+		} else if(pieceNum==2) {
+			drawPlayer3(pos, outMargin, inMargin, tileWidth);
+		} else {//only 4 pieces
+			drawPlayer4(pos, outMargin, inMargin, tileWidth);
+		}
+	}
+	
+	private void drawJail(int inMargin, int outMargin) {
+		g.setColor(Color.black);
+		int barNum = 5;
+		g.drawRect(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,inMargin/2,inMargin/2);
+		for(int i = 0; i < barNum; i++) {
+			g.drawLine(outMargin+inMargin/2+(i+1)*(inMargin/2)/barNum,panel.getHeight()-outMargin-inMargin,outMargin+inMargin/2+(i+1)*(inMargin/2)/barNum,panel.getHeight()-outMargin-inMargin/2);
+		}
+	}
+	
+	private void drawPlayer1(int pos, int outMargin, int inMargin, double tileWidth) {//"x"
+		int comMarg = outMargin + inMargin;
+		if(pos==0) {
+			g.drawLine(panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-inMargin/4);
+			g.drawLine(panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-inMargin/4);
+		} else if(pos<10) {
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin-(pos-1)*tileWidth),panel.getHeight()-outMargin-3*inMargin/4,(int)(panel.getWidth()-outMargin-inMargin-(pos)*tileWidth),panel.getHeight()-outMargin-inMargin/4);
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin-pos*tileWidth),panel.getHeight()-outMargin-3*inMargin/4,(int)(panel.getWidth()-outMargin-inMargin-(pos-1)*tileWidth),panel.getHeight()-outMargin-inMargin/4);
+		} else if(pos==10) {
+			g.drawLine(outMargin,panel.getHeight()-outMargin,outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin/2);
+			g.drawLine(outMargin,panel.getHeight()-outMargin-inMargin/2,outMargin+inMargin/2,panel.getHeight()-outMargin);
+		} else if(pos<20) {
+			g.drawLine((int)(outMargin+3*inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10-1)*tileWidth),(int)(outMargin+inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth));
+			g.drawLine((int)(outMargin+inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10-1)*tileWidth),(int)(outMargin+3*inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth));
+		} else if(pos==20) {
+			g.drawLine(outMargin+inMargin/4,outMargin+inMargin/4,outMargin+3*inMargin/4,outMargin+3*inMargin/4);
+			g.drawLine(outMargin+3*inMargin/4,outMargin+inMargin/4,outMargin+inMargin/4,outMargin+3*inMargin/4);
+		} else if(pos<30) {
+			g.drawLine((int)(outMargin+inMargin+(pos-21)*tileWidth),outMargin+3*inMargin/4,(int)(outMargin+inMargin+(pos-20)*tileWidth),outMargin+inMargin/4);
+			g.drawLine((int)(outMargin+inMargin+(pos-21)*tileWidth),outMargin+inMargin/4,(int)(outMargin+inMargin+(pos-20)*tileWidth),outMargin+3*inMargin/4);
+		} else if(pos==30) {
+			g.drawLine(panel.getWidth()-outMargin - inMargin/4,outMargin+inMargin/4,panel.getWidth()-outMargin-3*inMargin/4,outMargin+3*inMargin/4);
+			g.drawLine(panel.getWidth()-outMargin - 3*inMargin/4,outMargin+inMargin/4,panel.getWidth()-outMargin-inMargin/4,outMargin+3*inMargin/4);
+		} else if(pos<40) {
+			g.drawLine(panel.getWidth()-outMargin-inMargin/4,(int)(outMargin+inMargin+(pos-31)*(tileWidth)),panel.getWidth()-outMargin-3*inMargin/4,(int)(outMargin+inMargin+(pos-30)*tileWidth));
+			g.drawLine(panel.getWidth()-outMargin-3*inMargin/4,(int)(outMargin+inMargin+(pos-31)*(tileWidth)),panel.getWidth()-outMargin-inMargin/4,(int)(outMargin+inMargin+(pos-30)*tileWidth));
+		} else {//in jail
+			g.drawLine(outMargin+inMargin,panel.getHeight()-outMargin-inMargin,outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin/2);
+			g.drawLine(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,outMargin+inMargin,panel.getHeight()-outMargin-inMargin/2);
+			//draw bars over player
+			drawJail(inMargin,outMargin);
+		}
+	}
+	private void drawPlayer2(int pos, int outMargin, int inMargin, double tileWidth) {
+		if(pos<10) {
+			//g.
+		} else if(pos==10) {
+			
+		} else if(pos<20) {
+			
+		} else if(pos==20) {
+			
+		} else if(pos<30) {
+			
+		} else if(pos==30) {
+			
+		} else if(pos<40) {
+			
+		} else {//in jail
+			
+		}
+	}
+	private void drawPlayer3(int pos, int outMargin, int inMargin, double tileWidth) {
+		if(pos<10) {
+			//g.
+		} else if(pos==10) {
+			
+		} else if(pos<20) {
+			
+		} else if(pos==20) {
+			
+		} else if(pos<30) {
+			
+		} else if(pos==30) {
+			
+		} else if(pos<40) {
+			
+		} else {//in jail
+			
+		}
+	}
+	private void drawPlayer4(int pos, int outMargin, int inMargin, double tileWidth) {
+		if(pos<10) {
+			//g.
+		} else if(pos==10) {
+			
+		} else if(pos<20) {
+			
+		} else if(pos==20) {
+			
+		} else if(pos<30) {
+			
+		} else if(pos==30) {
+			
+		} else if(pos<40) {
+			
+		} else {//in jail
+			
+		}
+	}
+}
