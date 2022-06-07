@@ -9,6 +9,7 @@ public class Board {
 	private DrawingPanel panel;
 	private Graphics g;
 	private static Color boardColor;
+	private Card deck;
 	
 	//protected int[] tiles;
 	//protected Tile[] spaces;
@@ -17,6 +18,7 @@ public class Board {
 	private static Card decks;
 	
 	public Board() {
+		deck = new Card();
 		tiles = new Tile[41];
 		for(int i = 0; i < tiles.length; i++) {
 			if(isProperty[i]==1) {
