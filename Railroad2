@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.awt.Color;
 
-public class Railroad extends Tile {
+public class Railroad extends Property {
 	private int cost = 200;
 	private int playerOwner;
 	
@@ -24,8 +24,8 @@ public class Railroad extends Tile {
 	
 	public int calcRent(int pos) {
 		int count = 0;
-		for (int i = 0; i < players.get(playerOwner).getProps().size(); i++) {
-			if ((players.get(playerOwner).getProps().get(i).getPos() % 10) == 5) {
+		for (int i = 0; i < Board.getPlayers().get(playerOwner).getProps().size(); i++) {
+			if ((Board.getPlayers().get(playerOwner).getProps().get(i).getPos() % 10) == 5) {
 				count++;
 			}
 		}
@@ -43,16 +43,16 @@ public class Railroad extends Tile {
 	public void checkPos(int num, int roll) {
 		Scanner console = new Scanner(System.in);
 		super.checkPos(num, roll);
-		if ((pos == 5 || pos == 15 || pos == 25 || pos == 35) && (spaces[pos].getOwner() != num && spaces[pos].getOwner() > 0)) {
-			players.get(num).changeBal(-calcRent(pos));
-			players.get(spaces[pos].getOwner()).changeBal(calcRent(pos));
-		} else if ((pos == 5 || pos == 15 || pos == 25 || pos == 35) && (spaces[pos].getOwner() != num && spaces[pos].getOwner() == 0)) {
+		if ((pos == 5 || pos == 15 || pos == 25 || pos == 35) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() > 0)) {
+			Board.getPlayers().get(num).changeBal(-calcRent(pos));
+			Board.getPlayers().get(Board.getTiles()[pos].getOwner()).changeBal(calcRent(pos));
+		} else if ((pos == 5 || pos == 15 || pos == 25 || pos == 35) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() == 0)) {
 			System.out.println("Do you wish to purchase this property (Yes or No)? ");
 			System.out.println("Property Cost: " + getCost());
 			String str = console.next();
 			if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
-				players.get(num).changeBal(getCost());
-				playerOwner = players.get(num).getPlayerNum();
+				Board.getPlayers().get(num).changeBal(getCost());
+				playerOwner = Board.getPlayers().get(num).getPlayerNum();
 			}
 		}
 	}
