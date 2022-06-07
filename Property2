@@ -1,0 +1,389 @@
+import java.awt.Color;
+import java.util.*;
+
+public class Property extends Tile {
+	private Color color;
+	private int houses;
+	private boolean hotel;
+	private int cost;
+	private int playerOwner;
+	private int monopoly;
+	
+	public Property(int position) {
+		super(position);
+		color = getColor();
+		cost = getCost();
+		monopoly = getMonopoly();
+		playerOwner = 0;
+	}
+	
+	public int getPos() {
+		return pos;
+	}
+	
+	public void setHouses(int var) {
+		houses = var;
+	}
+	
+	public void setHotel(boolean bool) {
+		hotel = bool;
+	}
+	
+	public void printStats() {
+		super.printStats();
+		if (playerOwner == -1) {
+			System.out.println("Owner: None");
+			System.out.println("Cost to buy: " + cost);
+		} else {
+			System.out.println("Owner: " + (playerOwner + 1));
+			System.out.println("Rent: " + calcRent());
+			System.out.println("# of Houses: " + houses);
+			System.out.println("Hotel: " + hotel);
+		}
+	}
+	
+	public int getHouses() {
+		return houses;
+	}
+	
+	public boolean getHotel() {
+		return hotel;
+	}
+	
+	public int getMonopoly() {
+		if (pos == 1 || pos == 3) {
+			return 1;
+		} else if (pos == 6 || pos == 8 || pos == 9) {
+			return 2;
+		} else if (pos == 11 || pos == 13 || pos == 14) {
+			return 3;
+		} else if (pos == 16 || pos == 18 || pos == 19) {
+			return 4;
+		} else if (pos == 21 || pos == 23 || pos == 24) {
+			return 5;
+		} else if (pos == 26 || pos == 27 || pos == 29) {
+			return 6;
+		} else if (pos == 31 || pos == 32 || pos == 34) {
+			return 7;
+		} else if (pos == 37 || pos == 39) {
+			return 8;
+		}
+		return 999;
+	}
+	
+	public Color getColor() {
+		Color color;
+		if(pos==1||pos==3) {
+			//brown
+			color = new Color(139,69,19);
+			return color;
+		} else if(pos==6||pos==8||pos==9) {
+			return Color.cyan;
+		} else if(pos==11||pos==13||pos==14) {
+			return Color.magenta;
+		} else if(pos==16||pos==18||pos==19) {
+			return Color.orange;
+		} else if(pos==21||pos==23||pos==24) {
+			return Color.red;
+		} else if(pos==26||pos==27||pos==29) {
+			return Color.yellow;
+		} else if(pos==31||pos==32||pos==34) {
+			return Color.green;
+		} else if(pos==37||pos==39) {
+			return Color.blue;
+		}
+		return Board.getBoardColor();
+	}
+	
+	public void checkPos(int num, int roll) {
+		Scanner console = new Scanner(System.in);
+		super.checkPos(num, roll);
+		if ((pos == 1 || pos == 3 || pos == 6 || pos == 8 || pos == 9 || pos == 11 || pos == 13 || pos == 14 || pos == 16 || pos == 18 || pos == 19 || pos == 21 || pos == 23 || pos == 24 || pos == 26 || pos == 27 || pos == 29 || pos == 31 || pos == 32 || pos == 34 || pos == 37 || pos == 39) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() > 0)) {
+			Board.getPlayers().get(num).changeBal(-calcRent(pos));
+			Board.getPlayers().get(Board.getTiles()[pos].getOwner()).changeBal(calcRent(pos));
+		} else if ((pos == 1 || pos == 3 || pos == 6 || pos == 8 || pos == 9 || pos == 11 || pos == 13 || pos == 14 || pos == 16 || pos == 18 || pos == 19 || pos == 21 || pos == 23 || pos == 24 || pos == 26 || pos == 27 || pos == 29 || pos == 31 || pos == 32 || pos == 34 || pos == 37 || pos == 39) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() == 0)) {
+			System.out.println("Do you wish to purchase this property (Yes or No)? ");
+			System.out.println("Property Cost: " + getCost());
+			String str = console.next();
+			if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
+				Board.getPlayers().get(num).changeBal(getCost());
+				//would playerOwner = num; work?
+				playerOwner = Board.getPlayers().get(num).getPlayerNum();
+			}
+		}
+	}
+	
+	public int getCost() {
+		if (pos == 1 || pos == 3) {
+			return 60;
+		} else if (pos == 6 || pos == 8) {
+			return 100;
+		} else if (pos == 9) {
+			return 120;
+		} else if (pos == 11 || pos == 13) {
+			return 140;
+		} else if (pos == 14) {
+			return 160;
+		} else if (pos == 16 || pos == 18) {
+			return 180;
+		} else if (pos == 19) {
+			return 200;
+		} else if (pos == 21 || pos == 23) {
+			return 220;
+		} else if (pos == 24) {
+			return 240;
+		} else if (pos == 26 || pos == 27) {
+			return 260;
+		} else if (pos == 29) {
+			return 280;
+		} else if (pos == 31 || pos == 32) {
+			return 300;
+		} else if (pos == 34) {
+			return 320;
+		} else if (pos == 37) {
+			return 350;
+		} else if (pos == 39) {
+			return 400;
+		} else {
+			return 0;
+		}
+	}
+	
+	public int calcRent() {
+		if (pos == 1) {
+			if (houses == 0 && hotel == false) {
+				return 2;
+			} else if (houses == 1) {
+				return 10;
+			} else if (houses == 2) {
+				return 30;
+			} else if (houses == 3) {
+				return 90;
+			} else if (houses == 4) {
+				return 160;
+			} else if (hotel == true) {
+				return 250;
+			}
+		} else if (pos == 3) {
+			if (houses == 0 && hotel == false) {
+				return 4;
+			} else if (houses == 1) {
+				return 20;
+			} else if (houses == 2) {
+				return 60;
+			} else if (houses == 3) {
+				return 180;
+			} else if (houses == 4) {
+				return 320;
+			} else if (hotel == true) {
+				return 450;
+			}
+		} else if (pos == 6 || pos == 8) {
+			if (houses == 0 && hotel == false) {
+				return 6;
+			} else if (houses == 1) {
+				return 30;
+			} else if (houses == 2) {
+				return 90;
+			} else if (houses == 3) {
+				return 270;
+			} else if (houses == 4) {
+				return 400;
+			} else if (hotel == true) {
+				return 550;
+			}
+		} else if (pos == 9) {
+			if (houses == 0 && hotel == false) {
+				return 8;
+			} else if (houses == 1) {
+				return 40;
+			} else if (houses == 2) {
+				return 100;
+			} else if (houses == 3) {
+				return 300;
+			} else if (houses == 4) {
+				return 450;
+			} else if (hotel == true) {
+				return 600;
+			}
+		} else if (pos == 11 || pos == 13) {
+			if (houses == 0 && hotel == false) {
+				return 10;
+			} else if (houses == 1) {
+				return 50;
+			} else if (houses == 2) {
+				return 150;
+			} else if (houses == 3) {
+				return 450;
+			} else if (houses == 4) {
+				return 625;
+			} else if (hotel == true) {
+				return 750;
+			}
+		}
+		 else if (pos == 14) {
+				if (houses == 0 && hotel == false) {
+					return 12;
+				} else if (houses == 1) {
+					return 60;
+				} else if (houses == 2) {
+					return 180;
+				} else if (houses == 3) {
+					return 500;
+				} else if (houses == 4) {
+					return 700;
+				} else if (hotel == true) {
+					return 900;
+				}
+		} else if (pos == 16 || pos == 18) {
+			if (houses == 0 && hotel == false) {
+				return 14;
+			} else if (houses == 1) {
+				return 70;
+			} else if (houses == 2) {
+				return 200;
+			} else if (houses == 3) {
+				return 550;
+			} else if (houses == 4) {
+				return 750;
+			} else if (hotel == true) {
+				return 950;
+			}
+		} else if (pos == 19) {
+			if (houses == 0 && hotel == false) {
+				return 16;
+			} else if (houses == 1) {
+				return 80;
+			} else if (houses == 2) {
+				return 220;
+			} else if (houses == 3) {
+				return 600;
+			} else if (houses == 4) {
+				return 800;
+			} else if (hotel == true) {
+				return 1000;
+			}
+		} else if (pos == 21 || pos == 23) {
+			if (houses == 0 && hotel == false) {
+				return 18;
+			} else if (houses == 1) {
+				return 90;
+			} else if (houses == 2) {
+				return 250;
+			} else if (houses == 3) {
+				return 700;
+			} else if (houses == 4) {
+				return 875;
+			} else if (hotel == true) {
+				return 1050;
+			}
+		} else if (pos == 24) {
+			if (houses == 0 && hotel == false) {
+				return 20;
+			} else if (houses == 1) {
+				return 100;
+			} else if (houses == 2) {
+				return 300;
+			} else if (houses == 3) {
+				return 750;
+			} else if (houses == 4) {
+				return 925;
+			} else if (hotel == true) {
+				return 1100;
+			}
+		} else if (pos == 26 || pos == 27) {
+			if (houses == 0 && hotel == false) {
+				return 22;
+			} else if (houses == 1) {
+				return 110;
+			} else if (houses == 2) {
+				return 330;
+			} else if (houses == 3) {
+				return 800;
+			} else if (houses == 4) {
+				return 975;
+			} else if (hotel == true) {
+				return 1150;
+			}
+		} else if (pos == 29) {
+			if (houses == 0 && hotel == false) {
+				return 24;
+			} else if (houses == 1) {
+				return 120;
+			} else if (houses == 2) {
+				return 360;
+			} else if (houses == 3) {
+				return 850;
+			} else if (houses == 4) {
+				return 1025;
+			} else if (hotel == true) {
+				return 1200;
+			}
+		} else if (pos == 31 || pos == 32) {
+			if (houses == 0 && hotel == false) {
+				return 26;
+			} else if (houses == 1) {
+				return 130;
+			} else if (houses == 2) {
+				return 390;
+			} else if (houses == 3) {
+				return 900;
+			} else if (houses == 4) {
+				return 1100;
+			} else if (hotel == true) {
+				return 1275;
+			}
+		} else if (pos == 34) {
+			if (houses == 0 && hotel == false) {
+				return 28;
+			} else if (houses == 1) {
+				return 150;
+			} else if (houses == 2) {
+				return 450;
+			} else if (houses == 3) {
+				return 1000;
+			} else if (houses == 4) {
+				return 1200;
+			} else if (hotel == true) {
+				return 1400;
+			}
+		} else if (pos == 37) {
+			if (houses == 0 && hotel == false) {
+				return 35;
+			} else if (houses == 1) {
+				return 175;
+			} else if (houses == 2) {
+				return 500;
+			} else if (houses == 3) {
+				return 1100;
+			} else if (houses == 4) {
+				return 1300;
+			} else if (hotel == true) {
+				return 1500;
+			}
+		} else {
+			if (houses == 0 && hotel == false) {
+				return 50;
+			} else if (houses == 1) {
+				return 200;
+			} else if (houses == 2) {
+				return 600;
+			} else if (houses == 3) {
+				return 1400;
+			} else if (houses == 4) {
+				return 1700;
+			} else if (hotel == true) {
+				return 2000;
+			}
+		}
+		return 999999;
+	}
+	
+	public void setOwner(int ownerNum) {
+		playerOwner = ownerNum;
+	}
+	
+	public int getOwner() {
+		return playerOwner;
+	}
+}
