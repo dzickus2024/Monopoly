@@ -17,8 +17,8 @@ public class Player {
 	public Player(String name) {
 		//System.out.println("PLAYERSTART");
 		balance = 1500;
-		numPlayers++;
 		playerNum = numPlayers;
+		numPlayers++;
 		this.name = name;
 	}
 	
@@ -79,12 +79,14 @@ public class Player {
 		if ((pos + num) > 39 && inJail == false) {
 			pos = pos - 40 + num;
 			changeBal(200);
+			System.out.println("Collect $200 for passing Go!");
 		} else {
 			pos = pos + num;
 		}
-		checkSpace(num);
-		Board.getTiles()[pos].checkPos(playerNum, num);
-		if (roll1 == roll2 && inJail == true) {
+		System.out.println("Position: "+pos);
+		checkSpace(pos);
+		Board.getTiles()[pos].checkPos(playerNum, pos);
+		/*if (roll1 == roll2 && inJail == true) {
 			leaveJail();
 		} else if (roll1 == roll2) {
 			roll1 = Board.rollDice();
@@ -115,7 +117,7 @@ public class Player {
 					Board.getTiles()[pos].checkPos(playerNum, num);
 				}
 			}
-		}
+		}*/
 	}
 	public void setPos(int position, boolean passGo) {
 		if (position < pos && passGo == true) {
@@ -181,8 +183,11 @@ public class Player {
 		 * they have a monopoly
 		 */
 		Scanner console = new Scanner(System.in);
-		System.out.println("Purchase house(s)/hotel for (Property Name)? ");
-		String str = console.next();
+		System.out.println("Purchase house(s)/hotel for a property? ");
+		String in = console.next();
+		while(in.substring(0,1).toLowerCase().equals("y")) {
+			System.out.println("Enter property name");
+			String str = console.nextLine();
 		for (int i = 0; i < 40; i++) {
 			if (str.substring(0, 3).equals(Board.getTiles()[i].nameShort)) {
 				if (ownsMonopoly(i) == true) {
@@ -221,6 +226,9 @@ public class Player {
 					}
 				}
 			}
+		}
+		System.out.println("Purchase house(s)/hotel for a property? ");
+		in = console.next();
 		}
 	}
 	
@@ -264,5 +272,9 @@ public class Player {
 	
 	public static Color[] getColors() {
 		return colors;
+	}
+	
+	public String getName() {
+		return name;
 	}
 }
