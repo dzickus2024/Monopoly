@@ -107,8 +107,9 @@ public class Property extends Tile {
 			String str = console.next();
 			if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
 				Board.getPlayers().get(num).changeBal(getCost());
-				//would playerOwner = num; work?
-				playerOwner = Board.getPlayers().get(num).getPlayerNum();
+				//playerOwner = Board.getPlayers().get(num).getPlayerNum();
+				playerOwner = num;
+				System.out.println("You have successfully bought "+Board.getTiles()[roll].getName()+" for $"+getCost());
 			}
 		}
 	}
