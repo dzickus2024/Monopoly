@@ -7,19 +7,7 @@ public class Utility extends Property {
 	
 	public Utility(int position) {
 		super(position);
-		playerOwner = 0;
-	}
-	
-	public int getOwner() {
-		return playerOwner;
-	}
-	
-	public void setOwner(int num) {
-		playerOwner = num;
-	}
-	
-	public int getCost() {
-		return cost;
+		playerOwner = -1;
 	}
 	
 	public int calcRent(int pos, int roll) {
@@ -36,24 +24,7 @@ public class Utility extends Property {
 		}
 	}
 	
-	public void checkPos(int num, int roll) {
-		Scanner console = new Scanner(System.in);
-		super.checkPos(num, roll);
-		if ((pos == 12 || pos == 28) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() > 0)) {
-			Board.getPlayers().get(num).changeBal(-calcRent(pos));
-			Board.getPlayers().get(Board.getTiles()[pos].getOwner()).changeBal(calcRent(pos));
-		} else if ((pos == 12 || pos == 28) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() == 0)) {
-			System.out.println("Do you wish to purchase this property (Yes or No)? ");
-			System.out.println("Property Cost: " + getCost());
-			String str = console.next();
-			if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
-				Board.getPlayers().get(num).changeBal(getCost());
-				playerOwner = Board.getPlayers().get(num).getPlayerNum();
-			}
-		}
-	}
-	
-	public Color getColor() {
-		return Board.getBoardColor();
+	public int getCost() {
+		return cost;
 	}
 }
