@@ -14,7 +14,7 @@ public class Property extends Tile {
 		color = getColor();
 		cost = getCost();
 		monopoly = getMonopoly();
-		playerOwner = 0;
+		playerOwner = -1;
 	}
 	
 	public int getPos() {
@@ -50,6 +50,7 @@ public class Property extends Tile {
 		return hotel;
 	}
 	
+	//pass in a pos and it will return a boolean whether that property is a monopoly
 	public int getMonopoly() {
 		if (pos == 1 || pos == 3) {
 			return 1;
@@ -95,21 +96,30 @@ public class Property extends Tile {
 		return Board.getBoardColor();
 	}
 	
-	public void checkPos(int num, int roll) {
+	public void checkPos(int num, int pos) {
 		Scanner console = new Scanner(System.in);
-		super.checkPos(num, roll);
-		if ((pos == 1 || pos == 3 || pos == 6 || pos == 8 || pos == 9 || pos == 11 || pos == 13 || pos == 14 || pos == 16 || pos == 18 || pos == 19 || pos == 21 || pos == 23 || pos == 24 || pos == 26 || pos == 27 || pos == 29 || pos == 31 || pos == 32 || pos == 34 || pos == 37 || pos == 39) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() > 0)) {
-			Board.getPlayers().get(num).changeBal(-calcRent(pos));
-			Board.getPlayers().get(Board.getTiles()[pos].getOwner()).changeBal(calcRent(pos));
-		} else if ((pos == 1 || pos == 3 || pos == 6 || pos == 8 || pos == 9 || pos == 11 || pos == 13 || pos == 14 || pos == 16 || pos == 18 || pos == 19 || pos == 21 || pos == 23 || pos == 24 || pos == 26 || pos == 27 || pos == 29 || pos == 31 || pos == 32 || pos == 34 || pos == 37 || pos == 39) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() == 0)) {
+		System.out.println("owner:"+playerOwner);
+		//super.checkPos(num, pos);
+		if ((pos == 1 || pos == 3 || pos == 6 || pos == 8 || pos == 9 || pos == 11 || pos == 13 || pos == 14 || pos == 16 || pos == 18 || pos == 19 || pos == 21 || pos == 23 || pos == 24 || pos == 26 || pos == 27 || pos == 29 || pos == 31 || pos == 32 || pos == 34 || pos == 37 || pos == 39) && (Board.getTiles()[pos].getOwner() != num && Board.getTiles()[pos].getOwner() > -1)) {
+			int propOwner = Board.getTiles()[pos].getOwner();
+			int rent = calcRent();
+			Board.getPlayers().get(num).changeBal(-rent);
+			Board.getPlayers().get(propOwner).changeBal(rent);
+			System.out.println("Pay Player "+propOwner+" $"+rent);
+			Player.checkPlayer(num);
+		} else if ((pos == 1 || pos == 3 || pos == 6 || pos == 8 || pos == 9 || pos == 11 || pos == 13 || pos == 14 || pos == 16 || pos == 18 || pos == 19 || pos == 21 || pos == 23 || pos == 24 || pos == 26 || pos == 27 || pos == 29 || pos == 31 || pos == 32 || pos == 34 || pos == 37 || pos == 39) && (Board.getTiles()[pos].getOwner() == -1)) {
 			System.out.println("Do you wish to purchase this property (Yes or No)? ");
 			System.out.println("Property Cost: " + getCost());
 			String str = console.next();
 			if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
-				Board.getPlayers().get(num).changeBal(getCost());
-				//playerOwner = Board.getPlayers().get(num).getPlayerNum();
-				playerOwner = num;
-				System.out.println("You have successfully bought "+Board.getTiles()[roll].getName()+" for $"+getCost());
+				//check for proper funds
+				Board.getPlayers().get(num).changeBal(-getCost());
+				setOwner(num);
+				System.out.println("You have successfully bought "+Board.getTiles()[pos].getName()+" for $"+getCost());
+				Player.checkPlayer(num);
+				printStats();
+			} else {
+				System.out.println("failed to purchase");
 			}
 		}
 	}
@@ -382,6 +392,9 @@ public class Property extends Tile {
 	
 	public void setOwner(int ownerNum) {
 		playerOwner = ownerNum;
+		if(playerOwner!=-1) {//if you lose the property the bank takes it
+		Board.getPlayers().get(playerOwner).addProp(this);
+		}
 	}
 	
 	public int getOwner() {
