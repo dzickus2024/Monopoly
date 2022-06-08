@@ -1,28 +1,32 @@
 import java.util.*;
 
 public class MonopolyRunner {
+	public static boolean gameEnd;
 	public static void main(String[] args) {
 		Scanner console = new Scanner(System.in);
 		Board board = new Board();
 		board.drawBoard();
 		System.out.println("Make sure that the board is in the right position for you!!");
 		//System.out.println("SUCCESS");
-		boolean gameEnd = false;
+		gameEnd = false;
+		boolean moved;
 		while (gameEnd == false) {
 			for (int i = 0; i < board.getPlayers().size(); i++) {
-				boolean moved = false;
+				Player.checkPlayer(i);
+				moved = false;
 				while (moved == false) {
-					System.out.println("Do you wish to move (Yes or No)? (You must move at least once during your turn) ");
+					System.out.println(Board.getPlayers().get(i).getName()+" do you wish to move (Yes or No)? (You must move at least once during your turn) ");
 					String str = console.next();
 					if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
 						board.getPlayers().get(i).move();
 						moved = true;
 					}
-					board.getPlayers().get(i).checkSpace();
-					board.getPlayers().get(i).checkPlayer();
-					board.getPlayers().get(i).buyHouses();
+					//board.getPlayers().get(i).checkSpace();
+					//board.getPlayers().get(i).checkPlayer();
+					//board.getPlayers().get(i).buyHouses();
 				}
 			}
 		}
+		//player x won!!
 	}
 }
