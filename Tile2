@@ -116,7 +116,7 @@ public class Tile {
 		} else if (pos == 26) {
 			return "Atlantic Avenue";
 		} else if (pos == 27) {
-			return "Ventnor Avenue";
+			return "Ventor Avenue";
 		} else if (pos == 28) {
 			return "Water Works";
 		} else if (pos == 29) {
