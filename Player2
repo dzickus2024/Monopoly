@@ -70,18 +70,22 @@ public class Player {
 	}
 	
 	public void move() {
-		int roll1 = Board.rollDice();
-		int roll2 = Board.rollDice();
-		int num = roll1 + roll2;
-		System.out.println("(" + roll1 + ") + (" + roll2 + ") = (" + num + ")");
-		if ((pos + num) > 39 && inJail == false) {
+		//int roll1 = Board.rollDice();
+		//int roll2 = Board.rollDice();
+		//int num = roll1 + roll2;
+		//System.out.println("(" + roll1 + ") + (" + roll2 + ") = (" + num + ")");
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter pos to move to:");
+		int newP = scan.nextInt();
+		setPos(newP,newP<pos);
+		/*if ((pos + num) > 39 && inJail == false) {
 			pos = pos - 40 + num;
 			changeBal(200);
 			System.out.println("Collect $200 for passing Go!");
 			checkPlayer(playerNum);
 		} else {
 			pos = pos + num;
-		}
+		}*/
 		System.out.println("Position: "+pos);
 		checkSpace(pos);
 		Board.getTiles()[pos].checkPos(playerNum, pos);
@@ -122,6 +126,7 @@ public class Player {
 		if (position < pos && passGo == true) {
 			pos = position;
 			changeBal(200);
+			System.out.println("Collect $200 for passing Go!");
 		} else if (position > pos) {
 			pos = position;
 		}
