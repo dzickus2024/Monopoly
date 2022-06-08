@@ -80,6 +80,8 @@ public class Board {
 		if (freeParking >= 1000) {
 			//achievementFour();
 		}
+		System.out.println("Collect $"+freeParking+" from free parking");
+		Player.checkPlayer(player.getPlayerNum());
 		freeParking = 0;
 	}
 	
@@ -261,9 +263,19 @@ public class Board {
 		for (int i = 0; i < players.get(num).getProps().size(); i++) {
 			players.get(num).getProps().get(i).setHouses(0);
 			players.get(num).getProps().get(i).setHotel(false);
-			players.get(num).getProps().get(i).setOwner(0);
+			players.get(num).getProps().get(i).setOwner(-1);
 		}
 		players.remove(num);
+		System.out.println(players.get(num).getName()+" was removed for filing bankruptcy");
+		if(players.size()==1) {
+			MonopolyRunner.gameEnd = true;
+			System.out.println(players.get(0).getName()+" won the game finish your turn to end the game");
+		} else {
+			System.out.println("Player numbers have been changed according to order");
+			for(int i = num; i < players.size(); i++) {
+				players.get(i).setPNum(i);
+			}
+		}
 	}
 
 	public static void addParking(int var) {
