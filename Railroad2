@@ -1,20 +1,23 @@
 import java.util.Scanner;
 import java.awt.Color;
+import java.util.ArrayList;
 
 public class Railroad extends Property {
-	private int cost = 200;
-	private int playerOwner;
 	
 	public Railroad(int position) {
 		super(position);
 		playerOwner = -1;
+		cost = 200;
 	}
 	
 	public int calcRent(int pos) {
 		int count = 0;
-		for (int i = 0; i < Board.getPlayers().get(playerOwner).getProps().size(); i++) {
-			if ((Board.getPlayers().get(playerOwner).getProps().get(i).getPos() % 10) == 5) {
+		ArrayList<Property> props = new ArrayList<Property>();
+		props = Board.getPlayers().get(playerOwner).getProps();
+		for (int i = 0; i < props.size(); i++) {
+			if ((props.get(i).getPos() % 10) == 5) {
 				count++;
+				System.out.println(props.get(i).getName());
 			}
 		}
 		if (count == 1) {
