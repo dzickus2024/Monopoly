@@ -20,24 +20,22 @@ public class Player {
 		playerNum = numPlayers;
 		numPlayers++;
 		this.name = name;
+		props = new ArrayList<Property>();
 	}
 	
 	public int getPlayerNum() {
 		return playerNum;
 	}
 	
-	public ArrayList<Property> getProps() {
+	/*public ArrayList<Property> getProps() {
 		ArrayList<Property> props2 = props;
 		return props2;
-	}
+	}*/
 	
 	public void changeBal(int num) {
 		int var = balance;
 		balance += num;
 		if (balance < 0/*&&no more properties owned*/) {
-			for(int i = 0; i < props.size(); i++) {
-				props.get(i).setOwner(-1);
-			}
 			Board.removePlayer(playerNum);
 		}
 		/*if (var > balance) {
@@ -80,6 +78,7 @@ public class Player {
 			pos = pos - 40 + num;
 			changeBal(200);
 			System.out.println("Collect $200 for passing Go!");
+			checkPlayer(playerNum);
 		} else {
 			pos = pos + num;
 		}
@@ -232,7 +231,7 @@ public class Player {
 		}
 	}
 	
-	public void checkPlayer() {
+	public static void checkPlayer() {
 		/* should print the player's 
 		 * name, balance, and their
 		 * owned properties
@@ -246,19 +245,24 @@ public class Player {
 		while(checking) {
 		System.out.println("Check Player (Player Number)? ");
 		int var = console.nextInt();
-		if (var >= 0 || var < Board.getPlayers().size()) {
-			int num = var;
-			System.out.println("Player Number: " + Board.getPlayers().get(var).playerNum);
-			System.out.println("Balance: " + Board.getPlayers().get(var).balance);
-			System.out.print("Owned Properties: ");
-			for (int i = 0; i < Board.getPlayers().get(num).getProps().size(); i++) {
-				System.out.print(Board.getPlayers().get(num).getProps().get(i).nameShort);
-			}
-		}
+		checkPlayer(var);
 		System.out.println("Do you want to check another player? ");
 		if(console.nextLine().substring(0,1).toLowerCase().equals("n")) {
 			checking = false;
 		}
+		}
+	}
+	
+	public static void checkPlayer(int pNum) {
+		if (pNum >= 0 || pNum < Board.getPlayers().size()) {
+			int num = pNum;
+			System.out.println("\nPlayer Number: " + pNum+" Name: "+Board.getPlayers().get(pNum).getName());
+			System.out.println("Balance: " + Board.getPlayers().get(pNum).balance);
+			System.out.print("Owned Properties: ");
+			for (int i = 0; i < Board.getPlayers().get(num).getProps().size(); i++) {
+				System.out.print(Board.getPlayers().get(num).getProps().get(i).nameShort+" ");
+			}
+			System.out.println();
 		}
 	}
 	
@@ -276,5 +280,17 @@ public class Player {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public ArrayList<Property> getProps(){
+		return props;
+	}
+	
+	public void addProp(Property prop) {
+		props.add(prop);
+	}
+	
+	public void setPNum(int num) {
+		playerNum = num;
 	}
 }
