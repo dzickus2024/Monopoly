@@ -3,7 +3,7 @@ import java.awt.Graphics;
 import java.util.Scanner;
 import java.util.ArrayList;
 public class Board {
-	private int[] isProperty = {0,1,0,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,0,1,0};
+	private static int[] isProperty = {0,1,0,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,0,1,0};
 	private static Tile[] tiles;
 	//private static int freeParkingCash;
 	private DrawingPanel panel;
@@ -551,5 +551,9 @@ public class Board {
 		} else {//in jail
 			
 		}
+	}
+	
+	public static int[] getIsProp() {
+		return isProperty;
 	}
 }
