@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.io.Console;
 import java.util.*;
 
 public class Player {
@@ -14,6 +15,7 @@ public class Player {
 	private static String[] pieces = {"x","tri","plus","oval"};
 	private static Color[] colors = {Color.red,Color.green,Color.blue,Color.magenta};
 	private Board board;
+	private int doublesNum;
 	
 	public Player(String name, Board board) {
 		//System.out.println("PLAYERSTART");
@@ -72,11 +74,23 @@ public class Player {
 	}
 	
 	public void move(Board board) {
-		int roll1 = Board.rollDice();
-		int roll2 = Board.rollDice();
+		Scanner scan = new Scanner(System.in);
+		//int roll1 = Board.rollDice();
+		//int roll2 = Board.rollDice();
+		int roll1 = 6;
+		int roll2 = 6;
 		int num = roll1 + roll2;
+		if(roll1==roll2) {
+			doublesNum++;
+		} else {
+			doublesNum=0;
+		}
 		Board.setLastRoll(num);
 		System.out.println("(" + roll1 + ") + (" + roll2 + ") = (" + num + ")");
+		if(doublesNum==3) {
+			setPos(40,false);
+			doublesNum=0;
+		} else {
 		/*Board.setLastRoll(12);
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter pos to move to:");
@@ -87,13 +101,19 @@ public class Player {
 			changeBal(200);
 			System.out.println("Collect $200 for passing Go!");
 			checkPlayer(playerNum);
-		} else {
+		} else if(!inJail) {
 			pos = pos + num;
 		}
 		System.out.println("Position: "+pos);
 		board.move();
 		checkSpace(pos);
 		Board.getTiles()[pos].checkPos(playerNum, pos);
+		if(doublesNum>0) {
+			System.out.println("You rolled doubles... press enter to roll again");
+			scan.nextLine();
+			move(board);
+		}
+		}
 		/*if (roll1 == roll2 && inJail == true) {
 			leaveJail();
 		} else if (roll1 == roll2) {
@@ -127,6 +147,7 @@ public class Player {
 			}
 		}*/
 	}
+	
 	public void setPos(int change) {
 		Scanner scan = new Scanner(System.in);
 		pos+=change;
@@ -143,7 +164,11 @@ public class Player {
 	
 	public void setPos(int position, boolean passGo) {
 		Scanner scan = new Scanner(System.in);
-		if (position < pos && passGo == true) {
+		if(position==40) {
+			inJail=true;
+			pos=position;
+			System.out.println("You are now in jail...");
+		} else if (position < pos && passGo == true) {
 			pos = position;
 			changeBal(200);
 			System.out.println("Collect $200 for passing Go!");
@@ -236,7 +261,7 @@ public class Player {
 					}
 				}
 				if(pNum==-1) {
-					System.out.println("You do not a monopoly on these properties \nso you cannot buy any houses or hotels for this property");
+					System.out.println("You do not own a monopoly on these properties \nso you cannot buy any houses or hotels for this property");
 					return;
 				}
 				if (ownsMonopoly(pNum) == true) {
@@ -286,20 +311,20 @@ public class Player {
 		 * owned properties
 		 */
 		Scanner console = new Scanner(System.in);
-		boolean checking = true;
+		//boolean checking = true;
 		System.out.println("Do you want to check another player? ");
 		if(console.next().substring(0,1).toLowerCase().equals("n")) {
-			checking = false;
+			return;
 		}
-		while(checking) {
+		//while(checking) {
 		System.out.println("Check Player (Player Number)? ");
 		int var = console.nextInt();
 		checkPlayer(var-1);
-		System.out.println("Do you want to check another player? ");
-		if(console.next().substring(0,1).toLowerCase().equals("n")) {
+		//System.out.println("Do you want to check another player? ");
+		/*if(console.next().substring(0,1).toLowerCase().equals("n")) {
 			checking = false;
-		}
-		}
+		}*/
+		//}
 	}
 	
 	public static void checkPlayer(int pNum) {
