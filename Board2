@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.awt.Polygon;
+
 public class Board {
 	private static int[] isProperty = {0,1,0,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,0,1,0};
 	private static Tile[] tiles;
@@ -10,6 +12,12 @@ public class Board {
 	private Graphics g;
 	private static Color boardColor;
 	private Card deck;
+	private static int lastRoll;
+	private int outMargin;
+	private int inMargin;
+	private int combinedMargin;
+	private int tilesPerSide;
+	private double tileWidth;
 	
 	//protected int[] tiles;
 	//protected Tile[] spaces;
@@ -41,7 +49,7 @@ public class Board {
 		for (int i = 0; i < x; i++) {
 			System.out.println("Player " + (i + 1) + " name: ");
 			String name = console.next();
-			Player player = new Player(name);
+			Player player = new Player(name,this);
 			players.add(player);
 			//System.out.println("LOOPRESTART");
 		}
@@ -61,6 +69,11 @@ public class Board {
 		}
 		panel = new DrawingPanel(600,600);
 		g = panel.getGraphics();
+		outMargin = 25;
+		inMargin = 75;
+		combinedMargin = outMargin+inMargin;
+		tilesPerSide = 11;
+		tileWidth = (panel.getWidth()-2*combinedMargin)/(double)(tilesPerSide-2);
 	}
 	
 	public static ArrayList<Player> getPlayers() {
@@ -85,7 +98,7 @@ public class Board {
 		freeParking = 0;
 	}
 	
-	public static void drawChest(int num) {
+	public static void pickChest(int num) {
 		int card = decks.pickCard("chest");
 		if (card == 0) {
 			players.get(num).setPos(0, true);
@@ -100,7 +113,7 @@ public class Board {
 			if (decks.setJailCard("chest") == true) {
 				players.get(num).setChestCard(true);
 			} else {
-				drawChest(num);
+				pickChest(num);
 			}
 		} else if (card == 5) {
 			players.get(num).setPos(40, false);
@@ -135,7 +148,7 @@ public class Board {
 			players.get(num).changeBal(-50);
 			freeParking += 50;
 		} else if (card == 13) {
-			players.get(num).changeBal(25);
+			players.get(num).changeBal(-25);
 		} else if (card == 14) {
 			int var = players.get(num).numberOfHouses() * 40;
 			int var2 = players.get(num).numberOfHotels() * 115;
@@ -148,7 +161,7 @@ public class Board {
 		}
 	}
 	
-	public static void drawChance(int num) {
+	public static void pickChance(int num) {
 		int card = decks.pickCard("chance");
 		if (card == 0) {
 			players.get(num).setPos(0, true);
@@ -230,10 +243,10 @@ public class Board {
 			if (decks.setJailCard("chance") == true) {
 				players.get(num).setChanceCard(true);
 			} else {
-				drawChest(num);
+				pickChance(num);
 			}
 		} else if (card == 7) {
-			players.get(num).setPos((players.get(num).getPos()) - 3, true);
+			players.get(num).setPos(-3);
 		} else if (card == 8) {
 			int var = players.get(num).numberOfHouses() * 25;
 			int var2 = players.get(num).numberOfHotels() * 100;
@@ -289,6 +302,17 @@ public class Board {
 		return (int)(Math.random()*6)+1;
 	}
 	
+	public static int[] getIsProp() {
+		return isProperty;
+	}
+	
+	public static void setLastRoll(int roll) {
+		lastRoll = roll;
+	}
+	
+	public static int getLastRoll() {
+		return lastRoll;
+	}
 	/*public static void freeParking(Player player) {
 		player.changeBal(freeParking);
 	}*/
@@ -321,6 +345,13 @@ public class Board {
 		}
 	}*/
 	
+	public void move() {
+		drawBoard();
+		for(int i = 0; i < players.size(); i++) {
+			drawPlayer(i,players.get(i).getPos());
+		}
+	}
+	
 	public void drawBoard() {
 		Color color;
 		int outMargin = 25;
@@ -328,7 +359,7 @@ public class Board {
 		int combinedMargin = outMargin+inMargin;
 		int tilesPerSide = 11;
 		int offset = 0;
-		double widthTile = (panel.getWidth()-2*combinedMargin)/(double)(tilesPerSide-2);
+		double tileWidth = (panel.getWidth()-2*combinedMargin)/(double)(tilesPerSide-2);
 		color = boardColor;
 		g.setColor(color);
 		g.fillRect(outMargin,outMargin,panel.getWidth()-2*outMargin,panel.getHeight()-2*outMargin);
@@ -336,7 +367,7 @@ public class Board {
 		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
 			if(isProperty[i]==1) {
 				g.setColor(tiles[i].getColor());
-				g.fillRect((int)(panel.getWidth()-combinedMargin-i*widthTile),panel.getHeight()-combinedMargin,(int)(widthTile)+1,inMargin/4);
+				g.fillRect((int)(panel.getWidth()-combinedMargin-i*tileWidth),panel.getHeight()-combinedMargin,(int)(tileWidth)+1,inMargin/4);
 			} else {
 				//ends in 5 is a railroad
 			}
@@ -345,7 +376,7 @@ public class Board {
 		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
 			if(isProperty[i+offset]==1) {
 				g.setColor(tiles[i+offset].getColor());
-				g.fillRect((int)(outMargin+3*inMargin/4.0),(int)(panel.getWidth()-combinedMargin-i*(widthTile)),inMargin/4+1,(int)(widthTile)+1);
+				g.fillRect((int)(outMargin+3*inMargin/4.0),(int)(panel.getWidth()-combinedMargin-i*(tileWidth)),inMargin/4+1,(int)(tileWidth)+1);
 			} else {
 				//special drawing
 			}
@@ -354,7 +385,7 @@ public class Board {
 		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
 			if(isProperty[i+offset]==1) {
 				g.setColor(tiles[i+offset].getColor());
-				g.fillRect((int)(combinedMargin+i*widthTile),combinedMargin-inMargin/4+1,(int)(widthTile)+1,inMargin/4);
+				g.fillRect((int)(combinedMargin+i*tileWidth),combinedMargin-inMargin/4+1,(int)(tileWidth)+1,inMargin/4);
 			} else {
 				//special drawing
 			}
@@ -363,64 +394,135 @@ public class Board {
 		for(int i = 0; i < (tiles.length-1)/4; i++) {//exclude jail it will already be made
 			if(isProperty[i+offset]==1) {
 				g.setColor(tiles[i+offset].getColor());
-				g.fillRect(panel.getWidth()-combinedMargin,(int)(combinedMargin+i*widthTile),inMargin/4+1,(int)(widthTile)+1);
+				g.fillRect(panel.getWidth()-combinedMargin,(int)(combinedMargin+i*tileWidth),inMargin/4+1,(int)(tileWidth)+1);
 			} else {
 				//special drawing
 			}
 		}
 		//draw railroads
 		for(int i = 0; i < 4; i++) {
-			drawRailroad(5+i*10,widthTile,inMargin,outMargin);
+			drawRailroad(5+i*10);
 		}
+		drawElec(12);
+		drawWat(28);
+		drawFree(20);
+		drawChest(2);
+		drawChest(17);
+		drawChest(33);
+		//draw the lines
 		g.setColor(Color.BLACK);
 		g.drawRect(outMargin,outMargin,panel.getWidth()-2*outMargin,panel.getHeight()-2*outMargin);
 		g.drawRect(combinedMargin, combinedMargin, panel.getWidth()-2*combinedMargin, panel.getHeight()-2*combinedMargin);
 		for(int i = 0; i < tilesPerSide-1; i++) {
-			g.drawLine((int)(combinedMargin+i*widthTile),outMargin,(int)(combinedMargin+i*widthTile),combinedMargin);
+			g.drawLine((int)(combinedMargin+i*tileWidth),outMargin,(int)(combinedMargin+i*tileWidth),combinedMargin);
 		}
 		for(int i = 0; i < tilesPerSide-1; i++) {
-			g.drawLine((int)(combinedMargin+i*widthTile),panel.getHeight()-outMargin,(int)(combinedMargin+i*widthTile),panel.getHeight()-combinedMargin);
+			g.drawLine((int)(combinedMargin+i*tileWidth),panel.getHeight()-outMargin,(int)(combinedMargin+i*tileWidth),panel.getHeight()-combinedMargin);
 		}
 		for(int i = 0; i < tilesPerSide-1; i++) {
-			g.drawLine(outMargin,(int)(combinedMargin+i*widthTile),combinedMargin,(int)(combinedMargin+i*widthTile));
+			g.drawLine(outMargin,(int)(combinedMargin+i*tileWidth),combinedMargin,(int)(combinedMargin+i*tileWidth));
 		}
 		for(int i = 0; i < tilesPerSide-1; i++) {
-			g.drawLine(panel.getWidth()-outMargin,(int)(combinedMargin+i*widthTile),panel.getWidth()-combinedMargin,(int)(combinedMargin+i*widthTile));
+			g.drawLine(panel.getWidth()-outMargin,(int)(combinedMargin+i*tileWidth),panel.getWidth()-combinedMargin,(int)(combinedMargin+i*tileWidth));
 		}
 		/*for(int i = 0; i < 41; i++) {
-			drawPlayer(0,i,outMargin,inMargin,widthTile);
+			drawPlayer(1,i);
 		}*/
-		drawJail(inMargin,outMargin);
-		drawChest(inMargin,outMargin,(int)(widthTile),2);
+		drawJail();
 	}
 	
-	private void drawChest(int inMargin, int outMargin, int tileWidth, int pos) {
-		g.setColor(Color.cyan);
-		if(pos<10) {
-			g.fillRect(panel.getWidth()-outMargin-inMargin-tileWidth*(pos-1)-3*tileWidth/4,panel.getHeight()-outMargin-3*inMargin/4,tileWidth/2,inMargin/2);
+	private void drawFree(int pos) {
+		Polygon car = new Polygon();
+		g.setColor(Color.red);
+		if(pos==0) {
+			
+		} else if(pos==10) {
+			
+		} else if(pos==20) {
+			car.addPoint(60,90);
+			car.addPoint(30,60);
+			car.addPoint(60,30);
+			car.addPoint(90,60);
+			g.fillPolygon(car);
 			g.setColor(Color.white);
-			g.drawRect(panel.getWidth()-outMargin-inMargin-tileWidth*(pos-1)-3*tileWidth/4,panel.getHeight()-outMargin-3*inMargin/4,tileWidth/2,inMargin/2);
+			g.fillOval(52,50, 20, 20);
+			g.fillOval(30,45,5,10);
+			g.fillOval(45,30,5,10);
+		} else if(pos==30) {
+			
 		}
 	}
 	
-	private void drawRailroad(int pos, double width, int height, int margin) {
+	private void drawWat(int pos) {
+		Polygon drop = new Polygon();
+		g.setColor(Color.blue);
+		if(pos<10) {
+			
+		} else if(pos<20) {
+			
+		} else if(pos<30) {
+			g.fillOval((int)(outMargin+inMargin+(pos-21)*tileWidth+3),outMargin+inMargin/4-5,(int)(tileWidth)-5,inMargin/2-5);
+			drop.addPoint((int)(outMargin+inMargin+(pos-21)*tileWidth+3),outMargin+inMargin/2-2);
+			drop.addPoint((int)(outMargin+inMargin+(pos-21)*tileWidth+tileWidth/2+3),outMargin+3*inMargin/4+5);
+			drop.addPoint((int)(outMargin+inMargin+(pos-20)*tileWidth-4),outMargin+inMargin/2-2);
+			g.fillPolygon(drop);
+		} else if(pos<40) {
+			
+		}
+	}
+	
+	private void drawElec(int pos) {
 		g.setColor(Color.black);
 		if(pos<10) {
-			g.drawLine((int)(margin+height+width*(9-pos)+width/4.0),(int)(panel.getHeight()-margin-3*height/4.0),(int)(margin+height+width*(9-pos)+3*width/4.0),(int)(panel.getHeight()-margin-height/4.0));
-			g.drawLine((int)(margin+height+width*(9-pos)+width/4.0),(int)(panel.getHeight()-margin-height/4.0),(int)(margin+height+width*(9-pos)+3*width/4.0),(int)(panel.getHeight()-margin-3*height/4.0));
+			
 		} else if(pos<20) {
-			g.drawLine((int)(margin+height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0),(int)(margin+3*height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0));
-			g.drawLine((int)(margin+height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0),(int)(margin+3*height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0));
-		} else if(pos<30) {
-			g.drawLine((int)(margin+height+width*(pos%10-1)+width/4.0),(int)(margin+3*height/4.0),(int)(margin+height+width*(pos%10-1)+3*width/4.0),(int)(margin+height/4.0));
-			g.drawLine((int)(margin+height+width*(pos%10-1)+width/4.0),(int)(margin+height/4.0),(int)(margin+height+width*(pos%10-1)+3*width/4.0),(int)(margin+3*height/4.0));
-		} else {
-			g.drawLine((int)(panel.getWidth()-margin-height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0),(int)(panel.getWidth()-margin-3*height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0));
-			g.drawLine((int)(panel.getWidth()-margin-height/4.0),(int)(margin+height+width*(9-pos%10)+width/4.0),(int)(panel.getWidth()-margin-3*height/4.0),(int)(margin+height+width*(9-pos%10)+3*width/4.0));
+			g.fillRect(outMargin+inMargin/8,(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth+tileWidth/4),inMargin/5,(int)(tileWidth/2));
+			g.setColor(Color.yellow);
+			g.fillOval((int)(outMargin+inMargin/4),(int)(panel.getHeight()-outMargin-inMargin+(10-pos)*tileWidth+5),2*inMargin/3,(int)(tileWidth-10));
+			} else if(pos<30) {
+			
+		} else if(pos < 40) {
+			
 		}
 	}
 	
-	private void drawPlayer(int pieceNum, int pos, int outMargin, int inMargin, double tileWidth) {
+	private void drawChest(int pos) {
+		g.setColor(Color.cyan);
+		if(pos<10) {
+			g.fillRect((int)(panel.getWidth()-outMargin-inMargin-tileWidth*(pos-1)-3*tileWidth/4),panel.getHeight()-outMargin-3*inMargin/4,(int)(tileWidth/2),inMargin/2);
+			g.setColor(Color.white);
+			g.drawRect((int)(panel.getWidth()-outMargin-inMargin-tileWidth*(pos-1)-3*tileWidth/4),panel.getHeight()-outMargin-3*inMargin/4,(int)(tileWidth/2),inMargin/2);
+		} else if(pos<20) {
+			g.fillRect(outMargin+inMargin/4,(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth+tileWidth/4),inMargin/2,(int)(tileWidth/2));
+			g.setColor(Color.white);
+			g.drawRect(outMargin+inMargin/4,(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth+tileWidth/4),inMargin/2,(int)(tileWidth/2));
+		} else if(pos<30) {
+			
+		} else if(pos<40) {
+			g.fillRect(panel.getWidth()-outMargin-3*inMargin/4,(int)(outMargin+inMargin+(pos-31)*tileWidth+tileWidth/4),inMargin/2,(int)(tileWidth/2));
+			g.setColor(Color.white);
+			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4,(int)(outMargin+inMargin+(pos-31)*tileWidth+tileWidth/4),inMargin/2,(int)(tileWidth/2));
+		}
+	}
+	
+	private void drawRailroad(int pos) {
+		g.setColor(Color.black);
+		if(pos<10) {
+			g.drawLine((int)(outMargin+inMargin+tileWidth*(9-pos)+tileWidth/4.0),(int)(panel.getHeight()-outMargin-3*inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos)+3*tileWidth/4.0),(int)(panel.getHeight()-outMargin-inMargin/4.0));
+			g.drawLine((int)(outMargin+inMargin+tileWidth*(9-pos)+tileWidth/4.0),(int)(panel.getHeight()-outMargin-inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos)+3*tileWidth/4.0),(int)(panel.getHeight()-outMargin-3*inMargin/4.0));
+		} else if(pos<20) {
+			g.drawLine((int)(outMargin+inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+3*tileWidth/4.0),(int)(outMargin+3*inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+tileWidth/4.0));
+			g.drawLine((int)(outMargin+inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+tileWidth/4.0),(int)(outMargin+3*inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+3*tileWidth/4.0));
+		} else if(pos<30) {
+			g.drawLine((int)(outMargin+inMargin+tileWidth*(pos%10-1)+tileWidth/4.0),(int)(outMargin+3*inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(pos%10-1)+3*tileWidth/4.0),(int)(outMargin+inMargin/4.0));
+			g.drawLine((int)(outMargin+inMargin+tileWidth*(pos%10-1)+tileWidth/4.0),(int)(outMargin+inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(pos%10-1)+3*tileWidth/4.0),(int)(outMargin+3*inMargin/4.0));
+		} else {
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+3*tileWidth/4.0),(int)(panel.getWidth()-outMargin-3*inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+tileWidth/4.0));
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+tileWidth/4.0),(int)(panel.getWidth()-outMargin-3*inMargin/4.0),(int)(outMargin+inMargin+tileWidth*(9-pos%10)+3*tileWidth/4.0));
+		}
+	}
+	
+	private void drawPlayer(int pieceNum, int pos) {
 		Color color = Player.getColors()[pieceNum];
 		g.setColor(color);
 		if(pos==0) {
@@ -438,22 +540,22 @@ public class Board {
 		} else if(pos==30) {
 			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4,outMargin+inMargin/4,inMargin/2,inMargin/2);
 		} else if(pos<40) {
-			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4+2,(int)(outMargin+inMargin+(39-pos)*tileWidth),inMargin/2,(int)(tileWidth));
+			g.drawRect(panel.getWidth()-outMargin-3*inMargin/4+2,(int)(outMargin+inMargin+(pos-31)*tileWidth),inMargin/2,(int)(tileWidth));
 		} else {//in jail
 			g.drawRect(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,inMargin/2,inMargin/2);
 		}
 		if(pieceNum==0) {
-			drawPlayer1(pos, outMargin, inMargin, tileWidth);
+			drawPlayer1(pos);
 		} else if(pieceNum==1) {
-			drawPlayer2(pos, outMargin, inMargin, tileWidth);
+			drawPlayer2(pos);
 		} else if(pieceNum==2) {
-			drawPlayer3(pos, outMargin, inMargin, tileWidth);
+			drawPlayer3(pos);
 		} else {//only 4 pieces
-			drawPlayer4(pos, outMargin, inMargin, tileWidth);
+			drawPlayer4(pos);
 		}
 	}
 	
-	private void drawJail(int inMargin, int outMargin) {
+	private void drawJail() {
 		g.setColor(Color.black);
 		int barNum = 5;
 		g.drawRect(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,inMargin/2,inMargin/2);
@@ -462,8 +564,7 @@ public class Board {
 		}
 	}
 	
-	private void drawPlayer1(int pos, int outMargin, int inMargin, double tileWidth) {//"x"
-		int comMarg = outMargin + inMargin;
+	private void drawPlayer1(int pos) {//"x"
 		if(pos==0) {
 			g.drawLine(panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-inMargin/4);
 			g.drawLine(panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-3*inMargin/4,panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-inMargin/4);
@@ -492,10 +593,42 @@ public class Board {
 			g.drawLine(outMargin+inMargin,panel.getHeight()-outMargin-inMargin,outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin/2);
 			g.drawLine(outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin,outMargin+inMargin,panel.getHeight()-outMargin-inMargin/2);
 			//draw bars over player
-			drawJail(inMargin,outMargin);
+			drawJail();
 		}
 	}
-	private void drawPlayer2(int pos, int outMargin, int inMargin, double tileWidth) {
+	private void drawPlayer2(int pos) {
+		if(pos==0) {
+			g.drawLine(panel.getWidth()-outMargin-inMargin/4,panel.getHeight()-outMargin-inMargin/4,(panel.getWidth()-outMargin-inMargin/2),panel.getHeight()-outMargin-3*inMargin/4);
+			g.drawLine(panel.getWidth()-outMargin-3*inMargin/4,panel.getHeight()-outMargin-inMargin/4,(panel.getWidth()-outMargin-inMargin/2),panel.getHeight()-outMargin-3*inMargin/4);
+		} else if(pos<10) {
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin-(pos-1)*tileWidth),panel.getHeight()-outMargin-inMargin/4,(int)(panel.getWidth()-outMargin-inMargin-(pos)*tileWidth+tileWidth/2),panel.getHeight()-outMargin-3*inMargin/4);
+			g.drawLine((int)(panel.getWidth()-outMargin-inMargin-pos*tileWidth),panel.getHeight()-outMargin-inMargin/4,(int)(panel.getWidth()-outMargin-inMargin-(pos-1)*tileWidth-tileWidth/2),panel.getHeight()-outMargin-3*inMargin/4);
+		} else if(pos==10) {
+			g.drawLine(outMargin,panel.getHeight()-outMargin,outMargin+inMargin/4,panel.getHeight()-outMargin-inMargin/2);
+			g.drawLine(outMargin+inMargin/4,panel.getHeight()-outMargin-inMargin/2,outMargin+inMargin/2,panel.getHeight()-outMargin);
+		} else if(pos<20) {
+			g.drawLine((int)(outMargin+inMargin/2.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth),(int)(outMargin+3*inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10-1)*tileWidth));
+			g.drawLine((int)(outMargin+inMargin/4.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10-1)*tileWidth),(int)(outMargin+inMargin/2.0),(int)(panel.getHeight()-outMargin-inMargin-(pos-10)*tileWidth));
+		} else if(pos==20) {
+			g.drawLine(outMargin+inMargin/2,outMargin+inMargin/4,outMargin+3*inMargin/4,outMargin+3*inMargin/4);
+			g.drawLine(outMargin+inMargin/2,outMargin+inMargin/4,outMargin+inMargin/4,outMargin+3*inMargin/4);
+		} else if(pos<30) {
+			g.drawLine((int)(outMargin+inMargin+(pos-21)*tileWidth+tileWidth/2),outMargin+inMargin/4,(int)(outMargin+inMargin+(pos-20)*tileWidth),outMargin+3*inMargin/4);
+			g.drawLine((int)(outMargin+inMargin+(pos-21)*tileWidth),outMargin+3*inMargin/4,(int)(outMargin+inMargin+(pos-20)*tileWidth-tileWidth/2),outMargin+inMargin/4);
+		} else if(pos==30) {
+			g.drawLine(panel.getWidth()-outMargin - inMargin/2,outMargin+inMargin/4,panel.getWidth()-outMargin-3*inMargin/4,outMargin+3*inMargin/4);
+			g.drawLine(panel.getWidth()-outMargin - inMargin/2,outMargin+inMargin/4,panel.getWidth()-outMargin-inMargin/4,outMargin+3*inMargin/4);
+		} else if(pos<40) {
+			g.drawLine(panel.getWidth()-outMargin-inMargin/2,(int)(outMargin+inMargin+(pos-31)*(tileWidth)),panel.getWidth()-outMargin-3*inMargin/4,(int)(outMargin+inMargin+(pos-30)*tileWidth));
+			g.drawLine(panel.getWidth()-outMargin-inMargin/2,(int)(outMargin+inMargin+(pos-31)*(tileWidth)),panel.getWidth()-outMargin-inMargin/4,(int)(outMargin+inMargin+(pos-30)*tileWidth));
+		} else {//in jail
+			g.drawLine(outMargin+3*inMargin/4,panel.getHeight()-outMargin-inMargin,outMargin+inMargin/2,panel.getHeight()-outMargin-inMargin/2);
+			g.drawLine(outMargin+3*inMargin/4,panel.getHeight()-outMargin-inMargin,outMargin+inMargin,panel.getHeight()-outMargin-inMargin/2);
+			//draw bars over player
+			drawJail();
+		}
+	}
+	private void drawPlayer3(int pos) {
 		if(pos<10) {
 			//g.
 		} else if(pos==10) {
@@ -514,7 +647,7 @@ public class Board {
 			
 		}
 	}
-	private void drawPlayer3(int pos, int outMargin, int inMargin, double tileWidth) {
+	private void drawPlayer4(int pos) {
 		if(pos<10) {
 			//g.
 		} else if(pos==10) {
@@ -532,28 +665,5 @@ public class Board {
 		} else {//in jail
 			
 		}
-	}
-	private void drawPlayer4(int pos, int outMargin, int inMargin, double tileWidth) {
-		if(pos<10) {
-			//g.
-		} else if(pos==10) {
-			
-		} else if(pos<20) {
-			
-		} else if(pos==20) {
-			
-		} else if(pos<30) {
-			
-		} else if(pos==30) {
-			
-		} else if(pos<40) {
-			
-		} else {//in jail
-			
-		}
-	}
-	
-	public static int[] getIsProp() {
-		return isProperty;
 	}
 }
