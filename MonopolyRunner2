@@ -18,12 +18,12 @@ public class MonopolyRunner {
 					System.out.println(Board.getPlayers().get(i).getName()+" do you wish to move (Yes or No)? (You must move at least once during your turn) ");
 					String str = console.next();
 					if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
-						board.getPlayers().get(i).move();
+						board.getPlayers().get(i).move(board);
 						moved = true;
 					}
-					//board.getPlayers().get(i).checkSpace();
-					//board.getPlayers().get(i).checkPlayer();
-					//board.getPlayers().get(i).buyHouses();
+					board.getPlayers().get(i).checkSpace();
+					board.getPlayers().get(i).checkPlayer();
+					board.getPlayers().get(i).buyHouses();
 				}
 			}
 		}
