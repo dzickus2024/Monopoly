@@ -13,14 +13,16 @@ public class Player {
 	private String name;
 	private static String[] pieces = {"x","tri","plus","oval"};
 	private static Color[] colors = {Color.red,Color.green,Color.blue,Color.magenta};
+	private Board board;
 	
-	public Player(String name) {
+	public Player(String name, Board board) {
 		//System.out.println("PLAYERSTART");
 		balance = 1500;
 		playerNum = numPlayers;
 		numPlayers++;
 		this.name = name;
 		props = new ArrayList<Property>();
+		this.board = board;
 	}
 	
 	public int getPlayerNum() {
@@ -69,24 +71,27 @@ public class Player {
 		return count;
 	}
 	
-	public void move() {
-		//int roll1 = Board.rollDice();
-		//int roll2 = Board.rollDice();
-		//int num = roll1 + roll2;
-		//System.out.println("(" + roll1 + ") + (" + roll2 + ") = (" + num + ")");
+	public void move(Board board) {
+		int roll1 = Board.rollDice();
+		int roll2 = Board.rollDice();
+		int num = roll1 + roll2;
+		Board.setLastRoll(num);
+		System.out.println("(" + roll1 + ") + (" + roll2 + ") = (" + num + ")");
+		/*Board.setLastRoll(12);
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter pos to move to:");
 		int newP = scan.nextInt();
-		setPos(newP,newP<pos);
-		/*if ((pos + num) > 39 && inJail == false) {
+		setPos(newP,newP<pos);*/
+		if ((pos + num) > 39 && inJail == false) {
 			pos = pos - 40 + num;
 			changeBal(200);
 			System.out.println("Collect $200 for passing Go!");
 			checkPlayer(playerNum);
 		} else {
 			pos = pos + num;
-		}*/
+		}
 		System.out.println("Position: "+pos);
+		board.move();
 		checkSpace(pos);
 		Board.getTiles()[pos].checkPos(playerNum, pos);
 		/*if (roll1 == roll2 && inJail == true) {
@@ -122,7 +127,22 @@ public class Player {
 			}
 		}*/
 	}
+	public void setPos(int change) {
+		Scanner scan = new Scanner(System.in);
+		pos+=change;
+		if(pos>=40) {
+			pos-=40;
+		} else if(pos<0) {
+			pos+=40;
+		}
+		System.out.print("Press enter to continue");
+		scan.nextLine();
+		board.move();
+		Board.getTiles()[pos].checkPos(playerNum,pos);
+	}
+	
 	public void setPos(int position, boolean passGo) {
+		Scanner scan = new Scanner(System.in);
 		if (position < pos && passGo == true) {
 			pos = position;
 			changeBal(200);
@@ -130,6 +150,10 @@ public class Player {
 		} else if (position > pos) {
 			pos = position;
 		}
+		System.out.print("Press enter to continue");
+		scan.nextLine();
+		board.move();
+		
 	}
 	
 	public int getPos() {
@@ -141,6 +165,16 @@ public class Player {
 	}
 	
 	private boolean ownsMonopoly(int num) {
+		/*int num = -1;
+		for(Property prop : props) {
+			if(prop.getPos()==pos) {
+				num = props.indexOf(prop);
+			}
+		}
+		if(num==-1) {
+			System.out.println("You do not a monopoly on these properties \nso you cannot buy any houses or hotels for this property");
+			return false;
+		}*/
 		int mono = props.get(num).getMonopoly();
 		int count = 0;
 		for (int i = 0; i < props.size(); i++) {
@@ -188,40 +222,51 @@ public class Player {
 		 */
 		Scanner console = new Scanner(System.in);
 		System.out.println("Purchase house(s)/hotel for a property? ");
-		String in = console.next();
+		String in = console.nextLine();
+		int pNum;
+		int num;
 		while(in.substring(0,1).toLowerCase().equals("y")) {
-			System.out.println("Enter property name");
-			String str = console.nextLine();
-		for (int i = 0; i < 40; i++) {
-			if (str.substring(0, 3).equals(Board.getTiles()[i].nameShort)) {
-				if (ownsMonopoly(i) == true) {
-					if (props.get(i).getHouses() < 4 && props.get(i).getHotel() == false) {
-						System.out.println("Purchase House for " + props.get(i).getName() + " (Yes or No)?");
+			System.out.println("Enter property number");
+			num = console.nextInt();
+			if (num>=0&&num<Board.getTiles().length) {
+				pNum = -1;
+				for(Property prop : props) {
+					if(prop.getPos()==num) {
+						pNum = props.indexOf(prop);
+					}
+				}
+				if(pNum==-1) {
+					System.out.println("You do not a monopoly on these properties \nso you cannot buy any houses or hotels for this property");
+					return;
+				}
+				if (ownsMonopoly(pNum) == true) {
+					if (props.get(pNum).getHouses() < 4 && props.get(pNum).getHotel() == false) {
+						System.out.println("Purchase House for " + props.get(pNum).getName() + " (Yes or No)?");
 						String str2 = console.next();
 						if (str2.substring(0, 1).equals("y") || str2.substring(0, 1).equals("Y")) {
-							System.out.println("How many (1 - "+ (4 - props.get(i).getHouses()) +"?");
+							System.out.println("How many (1 - "+ (4 - props.get(pNum).getHouses()) +"?");
 							int var = console.nextInt();
-							if (var <= (4 - props.get(i).getHouses())) {
-								if (props.get(i).getPos() < 10) {
+							if (var <= (4 - props.get(pNum).getHouses())) {
+								if (props.get(pNum).getPos() < 10) {
 									changeBal(-(50 * var));
-								} else if (props.get(i).getPos() > 10 || props.get(i).getPos() < 20) {
+								} else if (props.get(pNum).getPos() > 10 || props.get(pNum).getPos() < 20) {
 									changeBal(-(100 * var));
-								} else if (props.get(i).getPos() > 20 || props.get(i).getPos() < 30) {
+								} else if (props.get(pNum).getPos() > 20 || props.get(pNum).getPos() < 30) {
 									changeBal(-(150 * var));
 								} else {
 									changeBal(-(200 * var));
 								}
 							}
 						}
-					} else if (props.get(i).getHouses() == 4 && props.get(i).getHotel() == false) {
-						System.out.println("Purchase Hotel for " + props.get(i).getName() + " (Yes or No)?");
+					} else if (props.get(pNum).getHouses() == 4 && props.get(pNum).getHotel() == false) {
+						System.out.println("Purchase Hotel for " + props.get(pNum).getName() + " (Yes or No)?");
 						String str2 = console.next();
 						if (str2.substring(0, 1).equals("y") || str2.substring(0, 1).equals("Y")) {
-							if (props.get(i).getPos() < 10) {
+							if (props.get(pNum).getPos() < 10) {
 								changeBal(-50);
-							} else if (props.get(i).getPos() > 10 || props.get(i).getPos() < 20) {
+							} else if (props.get(pNum).getPos() > 10 || props.get(pNum).getPos() < 20) {
 								changeBal(-100);
-							} else if (props.get(i).getPos() > 20 || props.get(i).getPos() < 30) {
+							} else if (props.get(pNum).getPos() > 20 || props.get(pNum).getPos() < 30) {
 								changeBal(-150);
 							} else {
 								changeBal(-200);
@@ -230,7 +275,6 @@ public class Player {
 					}
 				}
 			}
-		}
 		System.out.println("Purchase house(s)/hotel for a property? ");
 		in = console.next();
 		}
@@ -244,15 +288,15 @@ public class Player {
 		Scanner console = new Scanner(System.in);
 		boolean checking = true;
 		System.out.println("Do you want to check another player? ");
-		if(console.nextLine().substring(0,1).toLowerCase().equals("n")) {
+		if(console.next().substring(0,1).toLowerCase().equals("n")) {
 			checking = false;
 		}
 		while(checking) {
 		System.out.println("Check Player (Player Number)? ");
 		int var = console.nextInt();
-		checkPlayer(var);
+		checkPlayer(var-1);
 		System.out.println("Do you want to check another player? ");
-		if(console.nextLine().substring(0,1).toLowerCase().equals("n")) {
+		if(console.next().substring(0,1).toLowerCase().equals("n")) {
 			checking = false;
 		}
 		}
@@ -261,11 +305,11 @@ public class Player {
 	public static void checkPlayer(int pNum) {
 		if (pNum >= 0 || pNum < Board.getPlayers().size()) {
 			int num = pNum;
-			System.out.println("\nPlayer Number: " + pNum+" Name: "+Board.getPlayers().get(pNum).getName());
+			System.out.println("\nPlayer Number: " + (pNum+1)+" Name: "+Board.getPlayers().get(pNum).getName());
 			System.out.println("Balance: " + Board.getPlayers().get(pNum).balance);
 			System.out.print("Owned Properties: ");
 			for (int i = 0; i < Board.getPlayers().get(num).getProps().size(); i++) {
-				System.out.print(Board.getPlayers().get(num).getProps().get(i).nameShort+" ");
+				System.out.print(Board.getPlayers().get(num).getProps().get(i).name+" ");
 			}
 			System.out.println();
 		}
