@@ -15,15 +15,22 @@ public class MonopolyRunner {
 				Player.checkPlayer(i);
 				moved = false;
 				while (moved == false) {
-					System.out.println(Board.getPlayers().get(i).getName()+" do you wish to move (Yes or No)? (You must move at least once during your turn) ");
+					System.out.println(Board.getPlayers().get(i).getName()+" press 'm' to move, 's' to check the stats of a space, \n"
+							+ "'p' to check the stats of a player, or press 'h' to buy houses or hotels");
 					String str = console.next();
-					if (str.substring(0,1).equals("y") || str.substring(0,1).equals("Y")) {
+					char first = str.charAt(0);
+					if (first=='m') {
 						board.getPlayers().get(i).move(board);
 						moved = true;
+					} else if(first=='s') {
+						board.getPlayers().get(i).checkSpace();
+					} else if(first=='p') {
+						board.getPlayers().get(i).checkPlayer();
+					} else if(first=='h') {
+						board.getPlayers().get(i).buyHouses();
+					} else {
+						System.out.println("Failed to understand command");
 					}
-					board.getPlayers().get(i).checkSpace();
-					board.getPlayers().get(i).checkPlayer();
-					board.getPlayers().get(i).buyHouses();
 				}
 			}
 		}
