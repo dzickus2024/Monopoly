@@ -2,15 +2,14 @@ import java.util.Scanner;
 import java.awt.Color;
 
 public class Utility extends Property {
-	private int cost = 150;
-	private int playerOwner;
 	
 	public Utility(int position) {
 		super(position);
 		playerOwner = -1;
+		cost = 150;
 	}
 	
-	public int calcRent(int pos, int roll) {
+	public int calcRent() {
 		int count = 0;
 		for (int i = 0; i < Board.getPlayers().get(playerOwner).getProps().size(); i++) {
 			if (Board.getPlayers().get(playerOwner).getProps().get(i).getPos() == 12 || Board.getPlayers().get(playerOwner).getProps().get(i).getPos() == 28) {
@@ -18,9 +17,9 @@ public class Utility extends Property {
 			}
 		}
 		if (count == 1) {
-			return (4 * roll);
+			return (4 * Board.getLastRoll());
 		} else {
-			return (10 * roll);
+			return (10 * Board.getLastRoll());
 		}
 	}
 	
