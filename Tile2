@@ -39,9 +39,11 @@ public class Tile {
 		//System.out.println("tile check position");
 		//System.out.println(name + " (Position: " + (pos) + ")");
 		if (pos == 7 || pos == 22 || pos == 36) {
-			//Board.drawChance(num);
+			Board.pickChance(num);
+			Player.checkPlayer(num);
 		} else if (pos == 2 || pos == 17 || pos == 33) {
-			//Board.drawChest(num);
+			Board.pickChest(num);
+			Player.checkPlayer(num);
 		} else if (pos == 4) {
 			Board.getPlayers().get(num).changeBal(-200);
 			Board.addParking(200);
@@ -55,6 +57,7 @@ public class Tile {
 		} else if (pos == 20) {
 			//add freeparking to your balance and reset free parking and has a print statement
 			Board.freeParking(Board.getPlayers().get(num));
+			Player.checkPlayer(num);
 		} else if (pos == 30) {//go to jail
 			//Board.getPlayers().get(num).setPos(40, false);
 		}
