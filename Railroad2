@@ -10,7 +10,7 @@ public class Railroad extends Property {
 		cost = 200;
 	}
 	
-	public int calcRent(int pos) {
+	public int calcRent() {
 		int count = 0;
 		ArrayList<Property> props = new ArrayList<Property>();
 		props = Board.getPlayers().get(playerOwner).getProps();
