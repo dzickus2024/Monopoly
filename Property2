@@ -21,11 +21,11 @@ public class Property extends Tile {
 		return pos;
 	}
 	
-	public void setHouses(int var) {
+	public void setHouses(int var,Board board) {
 		houses = var;
 	}
 	
-	public void setHotel(boolean bool) {
+	public void setHotel(boolean bool, Board board) {
 		hotel = bool;
 	}
 	
