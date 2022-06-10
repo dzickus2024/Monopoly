@@ -45,6 +45,8 @@ public class Card {
 		chanceText.add("You have been elected Chairman of the Board. Pay each player $50");
 		chanceText.add("Your building and loan matures. Receive $150");
 		chanceText.add("You have won a crossword competition. Collect $100");
+		chanceDeck = shuffle(chanceText);
+		chestDeck = shuffle(chestText);
 	}
 	
 	/*public int pickCard(String type) {
@@ -74,14 +76,18 @@ public class Card {
 	
 	public int pickCard(String deckName) {
 		ArrayList<Integer> deck = new ArrayList<Integer>();
+		ArrayList<String> text = new ArrayList<String>();
 		if(deckName.equals("chest")) {
 			deck = chestDeck;
+			text = chestText;
 		} else if(deckName.equals("chance")) {
 			deck = chanceDeck;
+			text = chanceText;
 		} else {
 			return -1;
 		}
 		int card = deck.get(0);
+		System.out.println(text.get(card));
 		deck.remove(0);
 		deck.add(card); //put card on the bottom
 		return card;
