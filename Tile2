@@ -152,4 +152,20 @@ public class Tile {
 	public Color getColor() {
 		return Board.getBoardColor();
 	}
+	
+	public int getHouses() {
+		return -1;
+	}
+	
+	public boolean getHotel() {
+		return false;
+	}
+	
+	public void setHouses(int num) {
+		
+	}
+	
+public void setHotel(boolean hotel) {
+		
+	}
 }
