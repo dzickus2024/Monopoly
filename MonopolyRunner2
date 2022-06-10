@@ -10,6 +10,7 @@ public class MonopolyRunner {
 		//System.out.println("SUCCESS");
 		gameEnd = false;
 		boolean moved;
+		board.move();
 		while (gameEnd == false) {
 			for (int i = 0; i < board.getPlayers().size(); i++) {
 				Player.checkPlayer(i);
